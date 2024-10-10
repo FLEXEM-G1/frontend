@@ -52,3 +52,25 @@ button:hover {
     background-color: #ccc;
     border-radius: 50%;
 }
+
+.login-redirect {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.login-redirect p {
+    margin-bottom: 0.5rem;
+}
+
+.login-redirect button {
+    padding: 0.5rem 1rem;
+    background-color: #D01E53;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.login-redirect button:hover {
+    background-color: #d51d54;
+}
