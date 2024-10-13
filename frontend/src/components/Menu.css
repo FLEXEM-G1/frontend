@@ -6,3 +6,35 @@
     flex-grow: 1;
     padding: 2rem;
 }
+
+.main-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: #313532;
+}
+.rectangleText {
+    background-color: #D01E53;
+    padding: 20px;
+    border-radius: 4px;
+    color: #fff;
+    margin-bottom: 30px;
+    margin-top: 60px;
+}
+
+.text-container {
+    flex: 1;
+    padding:20px;
+}
+
+.chart-container {
+    flex: 0 0 500px; /* Adjust the width as needed */
+    margin-left: 20px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: #D9D9D9;
+}

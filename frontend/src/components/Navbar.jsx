@@ -25,7 +25,7 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
             )}
             {
                 !hideLogoutButton && (
-                    <button onClick={handleLogout} className="logout-button">
+                    <button onClick={handleLogout} className="button">
                         Cerrar Sesión
                     </button>
                 )

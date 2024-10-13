@@ -11,8 +11,8 @@ export const pieChartData = {
         {
             label: '# of Votes',
             data: [12, 19, 3],
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-            hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+            backgroundColor: ['#E84949', '#45B0E4', '#46D73D'],
+            hoverBackgroundColor: ['#E84949', '#45B0E4', '#46D73D'],
         },
     ],
 };
