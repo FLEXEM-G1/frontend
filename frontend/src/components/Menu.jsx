@@ -7,6 +7,7 @@ import VerCartera from '../pages/VerCartera';
 import { pieChartData } from './PieChart';
 import PieChart from './PieChart';
 import './Menu.css';
+import VerPerfil from "../pages/VerPerfil";
 
 const Menu = () => {
     const values = pieChartData.datasets[0].data;
@@ -21,6 +22,7 @@ const Menu = () => {
                     <Route path="/mis-registros" element={<MisRegistros />} />
                     <Route path="/generar-letras-facturas" element={<GenerarLetrasFacturas />} />
                     <Route path="/ver-cartera" element={<VerCartera />} />
+                    <Route path="/ver-perfil" element={<VerPerfil />} />
                 </Routes>
                 {location.pathname === '/menu' && (
                     <div className="main-container">
