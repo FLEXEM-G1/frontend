@@ -23,6 +23,7 @@ button:hover {
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
+    align-content: center;
     background-color: #f9f9f9;
 }
 
@@ -60,12 +61,21 @@ button:hover {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 400px;
     max-width: 90%;
-    border: 1px solid black ; /* Add border to modal */
+    border: 1px solid black ;
 }
 
 .form-field {
-    border: 1px solid black; /* Add border to form fields */
+    border: 1px solid black;
     padding: 10px;
     border-radius: 4px;
     margin-bottom: 10px;
+}
+
+.generar-letras-facturas-container {
+    display: flex;
+}
+
+.generar-letras-facturas {
+    flex: 1;
+    padding: 20px;
 }
