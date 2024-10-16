@@ -31,10 +31,13 @@ const styles = {
         border: '1px solid #000',
         borderRadius: '10px',
         width: '200px',
+        maxHeight: '425px',
+        overflow: 'auto',
         padding: '10px',
         marginBottom: '10px',
         backgroundColor: '#a52a3c',
         color: '#fff',
+        scrollbarWidth: 'none',
     },
     walletHeader: {
         display: 'flex',

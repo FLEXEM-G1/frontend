@@ -5,7 +5,9 @@
 
 .wallet-container {
     flex: 1;
+    height: auto;
     padding: 20px;
+    overflow: scroll;
 }
 
 .wallet-header {

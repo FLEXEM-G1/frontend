@@ -2,6 +2,10 @@
   text-align: center;
 }
 
+body, html {
+  overflow: hidden;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -42,8 +46,10 @@
 }
 
 .content {
+  overflow: auto;
   flex-grow: 1;
   padding: 2rem;
+  max-height: 80vh;
 }
 
 button {
