@@ -1,13 +1,14 @@
-// App.js
+// frontend/src/App.js
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Menu from './components/Menu';
-import Register from './pages/Register';
-import Login from './pages/Login';
-import Home from './pages/Home';
-import VerCartera from './pages/VerCartera';
-import GenerarLetrasFacturas from './pages/GenerarLetrasFacturas';
+import Navbar from './components/Navbar.jsx';
+import Menu from './components/Menu.jsx';
+import Register from './pages/Register.jsx';
+import Login from './pages/Login.jsx';
+import Home from './pages/Home.jsx';
+import VerCartera from './pages/VerCartera.jsx';
+import GenerarLetrasFacturas from './pages/GenerarLetrasFacturas.jsx';
+import MisRegistros from './pages/MisRegistros.jsx';
 import './App.css';
 
 function App() {
@@ -34,8 +35,9 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/ver-cartera" element={<VerCartera invoices={invoices} />} />
+            <Route path="/ver-cartera" element={<VerCartera />} />
             <Route path="/generar-letras-facturas" element={<GenerarLetrasFacturas addInvoice={addInvoice} />} />
+            <Route path="/mis-registros" element={<MisRegistros invoices={invoices} />} />
             <Route path="/*" element={isAuthenticated ? <Menu /> : <Navigate to="/login" />} />
             <Route path="/" element={<Navigate to="/home" />} />
           </Routes>

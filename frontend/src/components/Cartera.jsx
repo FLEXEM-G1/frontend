@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+// frontend/src/components/Cartera.jsx
+import React, { useState, useEffect } from 'react';
 import Invoice from './Invoice';
+import { getInvoiceBillsByPortfolioId } from '../services/invoiceBillService';
 
-const Wallet = ({ bankName, records }) => {
+const Wallet = ({ bankName, portfolioId }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [records, setRecords] = useState([]);
 
-    const toggleWallet = () => {
+    const toggleWallet = async () => {
         setIsOpen(!isOpen);
+        if (!isOpen) {
+            try {
+                const fetchedRecords = await getInvoiceBillsByPortfolioId(portfolioId);
+                setRecords(fetchedRecords);
+            } catch (error) {
+                console.error('Error fetching invoices:', error);
+            }
+        }
     };
 
     return (

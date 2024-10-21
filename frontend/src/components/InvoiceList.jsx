@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
-import Invoice from './Invoice'; // Import the Invoice component
+// frontend/src/components/InvoiceList.jsx
+import React, { useEffect, useState } from 'react';
+import Invoice from './Invoice';
 
-const InvoiceList = () => {
-    const [filter, setFilter] = useState('Todos'); // State for the filter
+const InvoiceList = ({ invoices }) => {
+    const [filter, setFilter] = useState('Todos');
 
-    // List of invoices with status
-    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    useEffect(() => {
+        console.log('InvoiceList - invoices:', invoices);
+    }, [invoices]);
 
-    // Filter invoices based on the selected filter
     const filteredInvoices = invoices.filter((invoice) => {
         if (filter === 'Todos') return true;
-        return invoice.status === filter;
+        return invoice.state === filter;
     });
 
     const getColor = (status) => {
@@ -44,7 +45,6 @@ const InvoiceList = () => {
                 </button>
             </div>
 
-            {/* Invoice list */}
             <div style={styles.invoiceList}>
                 {filteredInvoices.map((invoice) => (
                     <Invoice key={invoice.id} record={invoice} />
@@ -70,7 +70,6 @@ const styles = {
         flexDirection: 'column',
         padding: '20px',
         marginTop: '10px',
-
     },
     colorBox: {
         display: 'inline-block',

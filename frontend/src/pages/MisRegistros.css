@@ -1,19 +1,26 @@
+/* frontend/src/pages/MisRegistros.css */
 .mis-registros-container {
     display: flex;
-    justify-content: space-between;
-    padding: 20px;
     border-radius: 10px;
     background-color: white;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-color: #282c34;
 }
 
+.content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .records-container {
-    border: 1px solid #000;
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 70%;
 }
 
 .record {
@@ -27,6 +34,7 @@
 }
 
 .record-details {
+    display: none;
     margin-top: 10px;
     padding: 10px;
     background-color: #f9f9f9;
@@ -46,6 +54,7 @@
 }
 
 .filter-box {
+    margin-top: 20px;
     width: 25%;
     padding: 10px;
     border: 1px solid #ccc;

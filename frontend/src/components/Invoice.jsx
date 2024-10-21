@@ -1,13 +1,14 @@
+// frontend/src/components/Invoice.jsx
 import React from 'react';
 
 const Invoice = ({ record }) => {
-    const getBorderColor = (status) => {
+    const getBackgroundColor = (status) => {
         switch (status) {
-            case 'Pendiente':
+            case 'Pending':
                 return '#46D73D';
-            case 'Pagado':
+            case 'Payte':
                 return '#45B0E4';
-            case 'Vencido':
+            case 'Expired':
                 return '#E84949';
             default:
                 return '#fff';
@@ -15,13 +16,13 @@ const Invoice = ({ record }) => {
     };
 
     return (
-        <div style={{ ...styles.invoice, borderColor: getBorderColor(record.status), color: "black" }}>
-            <p>Factura {record.id}</p>
-            <p>Monto: {record.monto}</p>
-            <p>Tipo: {record.tipo}</p>
-            <p>Fecha de Emisión: {record.fechaEmision}</p>
-            <p>Fecha de Expiración: {record.fechaVencimiento}</p>
-            <p>Estado: {record.status}</p>
+        <div style={{ ...styles.invoice, backgroundColor: getBackgroundColor(record.state), color: "black" }}>
+            <p>Factura {record.invoiceBillNumber}</p>
+            <p>Monto: {record.amount} {record.currency}</p>
+            <p>Tipo: {record.type}</p>
+            <p>Fecha de Emisión: {new Date(record.issueDate).toLocaleDateString()}</p>
+            <p>Fecha de Expiración: {new Date(record.expirationDate).toLocaleDateString()}</p>
+            <p>Estado: {record.state}</p>
         </div>
     );
 };

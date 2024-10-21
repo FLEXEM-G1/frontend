@@ -3,11 +3,28 @@
     display: flex;
 }
 
+.content{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
 .wallet-container {
     flex: 1;
     height: auto;
     padding: 20px;
+    border-radius: 10px;
     overflow: scroll;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
 }
 
 .wallet-header {
@@ -16,6 +33,7 @@
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    margin-bottom: 10px;
 }
 
 .wallet-list {
