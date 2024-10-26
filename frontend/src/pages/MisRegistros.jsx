@@ -13,6 +13,7 @@ const MisRegistros = () => {
             try {
                 const response = await getAllInvoiceBills();
                 if (response.data && response.data.length > 0) {
+                    console.log('Fetched invoices:', response.data);
                     setInvoices(response.data);
                 } else {
                     console.warn('No invoices found');
@@ -22,7 +23,7 @@ const MisRegistros = () => {
             }
         };
 
-        fetchInvoices();
+        fetchInvoices().then(r => r).catch(e => e);
     }, []);
 
     return (

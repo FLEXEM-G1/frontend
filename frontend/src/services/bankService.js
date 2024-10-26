@@ -1,7 +1,14 @@
-import http from './http-common';
+// frontend/src/services/bankService.js
+import http from './http-common.js';
 
 export const getAllBanks = async () => {
-    return await http.get('/banks');
+    try {
+        const response = await http.get('/banks');
+        return Array.isArray(response.data) ? response.data : []; // Ensure response is an array
+    } catch (error) {
+        console.error('Error fetching banks:', error);
+        return []; // Return an empty array on error
+    }
 };
 
 export const getBankById = async (id) => {

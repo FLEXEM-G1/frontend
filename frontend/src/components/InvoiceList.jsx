@@ -16,11 +16,11 @@ const InvoiceList = ({ invoices }) => {
 
     const getColor = (status) => {
         switch (status) {
-            case 'Pendiente':
+            case 'Pending':
                 return '#46D73D';
-            case 'Pagado':
+            case 'Payte':
                 return '#45B0E4';
-            case 'Vencido':
+            case 'Expired':
                 return '#E84949';
             default:
                 return '#ccc';
@@ -34,22 +34,24 @@ const InvoiceList = ({ invoices }) => {
                 <button onClick={() => setFilter('Todos')}>
                     <span style={{ ...styles.colorBox, backgroundColor: getColor('Todos') }}></span> Todos
                 </button>
-                <button onClick={() => setFilter('Pendiente')}>
-                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Pendiente') }}></span> Pendiente
+                <button onClick={() => setFilter('Pending')}>
+                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Pending') }}></span> Pendiente
                 </button>
-                <button onClick={() => setFilter('Vencido')}>
-                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Vencido') }}></span> Vencido
+                <button onClick={() => setFilter('Expired')}>
+                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Expired') }}></span> Vencido
                 </button>
-                <button onClick={() => setFilter('Pagado')}>
-                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Pagado') }}></span> Pagado
+                <button onClick={() => setFilter('Payte')}>
+                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Payte') }}></span> Pagado
                 </button>
             </div>
 
             <div style={styles.invoiceList}>
-                {filteredInvoices.map((invoice) => (
-                    <Invoice key={invoice.id} record={invoice} />
-                ))}
+                {filteredInvoices.map((invoice) => {
+                    console.log('Portfolio id', invoice.portfolioId);
+                    return <Invoice key={invoice._id} record={invoice} />;
+                })}
             </div>
+
         </div>
     );
 };

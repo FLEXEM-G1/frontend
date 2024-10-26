@@ -12,13 +12,13 @@ const Login = ({ onLogin }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        console.log('Login attempt with email:', email, 'and password:', password);
         try {
-            await signIn({ email, password });
+            const response = await signIn({ email, password });
             onLogin();
             navigate('/menu');
         } catch (error) {
             console.error('Error during login:', error);
-            // Handle error (e.g., show error message)
         }
     };
 

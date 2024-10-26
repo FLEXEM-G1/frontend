@@ -1,4 +1,4 @@
-// services/portfolioService.js
+// frontend/src/services/portfolioService.js
 import http from './http-common.js';
 
 export const getAllPortfolios = async () => {
@@ -6,9 +6,15 @@ export const getAllPortfolios = async () => {
 };
 
 export const getPortfolioById = async (id) => {
-    return await http.get(`/portfolios/${id}`);
+    const url = `/portfolios/${id}`;
+    console.log('Requesting URL:', url); // Log the URL being requested
+    try {
+        return await http.get(url);
+    } catch (error) {
+        console.error('Error fetching portfolio data:', error);
+        throw error;
+    }
 };
-
 export const createPortfolio = async (portfolio) => {
     try {
         const response = await http.post('/portfolios', portfolio);
@@ -24,7 +30,14 @@ export const updatePortfolio = async (id, portfolio) => {
 };
 
 export const calculateTceaForPortfolio = async (id, data) => {
-    return await http.put(`/portfolios/${id}/tcea`, data);
+    try {
+        console.log('Payload:', data); // Log the payload
+        const response = await http.put(`/portfolios/${id}/tcea`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Error calculating TCEA:', error.response ? error.response.data : error.message);
+        throw error;
+    }
 };
 
 export const deletePortfolio = async (id) => {
