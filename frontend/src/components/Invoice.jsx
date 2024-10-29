@@ -42,7 +42,7 @@ const Invoice = ({ record }) => {
             <p>Fecha de Expiración: {record.expirationDate ? new Date(record.expirationDate).toLocaleDateString() : 'N/A'}</p>
             <p>RUC/DNI: {record.rucDni || 'N/A'}</p>
             <p>Razón Social: {record.razSocNam || 'N/A'}</p>
-            <p>TCEA: {record.tcea.toFixed(2)}</p>
+            <p>TCEA: {record.tcea !==undefined ? record.tcea.toFixed(2) : 'N/A'}</p>
         </div>
     );
 };

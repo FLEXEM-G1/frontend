@@ -1,6 +1,7 @@
 // frontend/src/components/InvoiceList.jsx
 import React, { useEffect, useState } from 'react';
 import Invoice from './Invoice';
+import {deleteInvoiceBill, updateInvoiceBill} from "../services/invoiceBillService.js";
 
 const InvoiceList = ({ invoices }) => {
     const [filter, setFilter] = useState('Todos');
@@ -27,6 +28,16 @@ const InvoiceList = ({ invoices }) => {
         }
     };
 
+    function setInvoices(updatedInvoices) {
+        updatedInvoices.forEach(invoice => {
+            updateInvoiceBill(invoice._id, invoice).then(response => {
+                console.log('Invoice updated:', response.data);
+            }).catch(error => {
+                console.error('Error updating invoice:', error);
+            });
+        });
+    }
+
     return (
         <div style={styles.container}>
             <div style={styles.sidebar}>
@@ -52,6 +63,26 @@ const InvoiceList = ({ invoices }) => {
                 })}
             </div>
 
+            <button onClick={() => {
+                const updatedInvoices = filteredInvoices.map(invoice => {
+                    let newState;
+                    switch (invoice.state) {
+                        case 'Pending':
+                            newState = 'Payte';
+                            break;
+                        case 'Payte':
+                            newState = 'Expired';
+                            break;
+                        case 'Expired':
+                            deleteInvoiceBill(invoice._id);
+                        default:
+                            newState = 'Pending';
+                    }
+                    return {...invoice, state: newState};
+                });
+                setInvoices(updatedInvoices);
+            }}>Actualizar Estados
+            </button>
         </div>
     );
 };

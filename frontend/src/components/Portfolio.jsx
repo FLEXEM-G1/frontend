@@ -1,9 +1,9 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
-import { deletePortfolio } from '../services/portfolioService';
+import {calculateTceaForPortfolio, deletePortfolio} from '../services/portfolioService';
 import Invoice from './Invoice';
 import Modal from './Modal';
 import { getInvoiceBillsByPortfolioId } from '../services/invoiceBillService.js';
-import jsPDF from 'jspdf';
+import JsPDF from 'jspdf';
 
 const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelete }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -34,21 +34,22 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
     };
 
     const handleDownloadPDF = async () => {
-        try{
+        try {
             const response = await getInvoiceBillsByPortfolioId(portfolioId);
             const invoices = response.data;
 
-            const doc = new jsPDF();
+            const doc = new JsPDF();
             doc.text('Invoices', 10, 10);
 
             invoices.forEach((invoice, index) => {
-                doc.text(`Invoice ${index + 1}`, 10, 20 + index * 10);
-                doc.text(`Amount: ${invoice.amount}`, 10, 30 + index * 10);
-                doc.text(`State: ${invoice.state}`, 10, 40 + index * 10);
-                doc.text(`Due date: ${invoice.dateTcea}`, 10, 50 + index * 10);
-                doc.text(`Portfolio ID: ${invoice.portfolioId}`, 10, 70 + index * 10);
+                const yOffset = 30 + index * 80;
+                doc.text(`Invoice ${index + 1}`, 10, yOffset);
+                doc.text(`Amount: ${invoice.amount}`, 10, yOffset + 10);
+                doc.text(`Due date: ${invoice.dateTcea}`, 10, yOffset + 20);
+                doc.text( 'RUC/DNI: ' + invoice.rucDni, 10, yOffset + 30);
+                doc.text(`Due date: ${invoice.dateTcea}`, 10, yOffset + 40);
+                doc.text(`TCEA: ${invoice.tcea}`, 10, yOffset + 50);
             });
-
             doc.save('invoices.pdf');
         } catch (error) {
             console.error('Error downloading PDF:', error);

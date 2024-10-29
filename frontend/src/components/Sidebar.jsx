@@ -1,12 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Link } from 'react-router-dom';
 import './Sidebar.css';
 
 const Sidebar = () => {
+
+    let user = { name: localStorage.getItem('name') };
     return (
         <div className="sidebar">
             <div className="greeting-container">
-                <p>Hola!</p>
+                <p>Hola {user.name}!</p>
                 <Link to="/ver-perfil">Ver perfil</Link>
             </div>
             <Link to="/mis-registros">Mis Registros</Link>
