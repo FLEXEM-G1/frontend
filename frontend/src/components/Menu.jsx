@@ -1,4 +1,3 @@
-// frontend/src/components/Menu.jsx
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
@@ -26,6 +25,7 @@ const Menu = () => {
     });
     const [totalInvoices, setTotalInvoices] = useState(0);
     const [pendingInvoices, setPendingInvoices] = useState(0);
+    const [tceaAverage, setTceaAverage] = useState(0);
 
     useEffect(() => {
         const fetchInvoices = async () => {
@@ -53,6 +53,7 @@ const Menu = () => {
 
                 setTotalInvoices(invoices.length);
                 setPendingInvoices(statusCounts.Pending);
+
             } catch (error) {
                 console.error('Error fetching invoices:', error);
             }
@@ -66,13 +67,13 @@ const Menu = () => {
 
     return (
         <div className="menu">
-            <Sidebar />
+            <Sidebar/>
             <div className="content">
                 <Routes>
                     <Route path="/" element={<Menu />} />
                     <Route path="/mis-registros" element={<MisRegistros />} />
                     <Route path="/generar-letras-facturas" element={<GenerarLetrasFacturas />} />
-                    <Route path="/ver-cartera" element={<VerCartera />} />
+                    <Route path="/ver-cartera" element={<VerCartera setTceaAverage={setTceaAverage} />} />
                     <Route path="/ver-perfil" element={<VerPerfil />} />
                 </Routes>
                 {location.pathname === '/menu' && (
@@ -80,7 +81,7 @@ const Menu = () => {
                         <div className="text-container">
                             <div className="rectangleText">Total Letras/Facturas: {totalInvoices}</div>
                             <div className="rectangleText">Letras a vencer: {pendingInvoices}</div>
-                            <div className="rectangleText">TCEA Promedio: </div>
+                            <div className="rectangleText">TCEA Promedio: {tceaAverage.toFixed(2)}</div>
                         </div>
                         <div className="chart-container">
                             <PieChart data={pieChartData} />

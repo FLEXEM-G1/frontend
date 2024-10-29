@@ -12,12 +12,14 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
     const [newInvoiceBill, setNewInvoiceBill] = useState({
         portfolioId: '',
         invoiceBillNumber: '',
+        rucDni: '',
+        razSocNam: '',
         type: '',
         amount: '',
         currency: '',
         issueDate: '',
         expirationDate: '',
-        state: '',
+        state: 'Pending',
     });
 
     const invoiceTypes = [
@@ -40,7 +42,13 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
 
     const handlePortfolioChange = (e) => {
         const selectedPortfolio = portfolios.find(portfolio => portfolio._id === e.value._id);
-        setNewInvoiceBill({ ...newInvoiceBill, portfolioId: selectedPortfolio._id, currency: selectedPortfolio.currency });
+        setNewInvoiceBill({
+            ...newInvoiceBill,
+            portfolioId: selectedPortfolio._id,
+            currency: selectedPortfolio.currency,
+            rucDni: selectedPortfolio.rucDni,
+            razSocNam: selectedPortfolio.razSocNam
+        });
     };
 
     const handleTypeChange = (e) => {
@@ -60,12 +68,14 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
             setNewInvoiceBill({
                 portfolioId: '',
                 invoiceBillNumber: '',
+                rucDni: '',
+                razSocNam: '',
                 type: '',
                 amount: '',
                 currency: '',
                 issueDate: '',
                 expirationDate: '',
-                state: '',
+                state: 'Pending',
             });
             setIsModalOpen(false);
         } catch (error) {
@@ -120,6 +130,28 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             />
                         </div>
                         <div className="form-group">
+                            <label htmlFor="rucDni">RUC/DNI</label>
+                            <input
+                                type="text"
+                                name="rucDni"
+                                value={newInvoiceBill.rucDni}
+                                onChange={handleChange}
+                                placeholder="RUC/DNI"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="razSocNam">Razón Social/Nombres</label>
+                            <input
+                                type="text"
+                                name="razSocNam"
+                                value={newInvoiceBill.razSocNam}
+                                onChange={handleChange}
+                                placeholder="Razón Social/Nombres"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
                             <label htmlFor="amount">Amount</label>
                             <input
                                 type="number"
@@ -161,17 +193,6 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                                 value={newInvoiceBill.expirationDate}
                                 onChange={handleChange}
                                 placeholder="Expiration Date"
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="state">State</label>
-                            <input
-                                type="text"
-                                name="state"
-                                value={newInvoiceBill.state}
-                                onChange={handleChange}
-                                placeholder="State"
                                 required
                             />
                         </div>

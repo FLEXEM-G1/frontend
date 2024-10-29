@@ -6,7 +6,7 @@ const Sidebar = () => {
     return (
         <div className="sidebar">
             <div className="greeting-container">
-                <p>Hola, Usuario!</p>
+                <p>Hola!</p>
                 <Link to="/ver-perfil">Ver perfil</Link>
             </div>
             <Link to="/mis-registros">Mis Registros</Link>

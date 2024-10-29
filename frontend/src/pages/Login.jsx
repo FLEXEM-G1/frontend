@@ -1,4 +1,3 @@
-// frontend/src/pages/Login.jsx
 import React, { useState } from 'react';
 import './Login.css';
 import logo from '../assets/black-and-white-logo.png';

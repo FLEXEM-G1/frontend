@@ -3,6 +3,7 @@ import { deletePortfolio } from '../services/portfolioService';
 import Invoice from './Invoice';
 import Modal from './Modal';
 import { getInvoiceBillsByPortfolioId } from '../services/invoiceBillService.js';
+import jsPDF from 'jspdf';
 
 const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelete }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -16,8 +17,7 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
     const openInvoicesModal = async () => {
         try {
             const response = await getInvoiceBillsByPortfolioId(portfolioId);
-            console.log('Invoices for portfolio:', portfolioId, response);
-            setInvoices(response || []);
+            setInvoices(response.data);
             setIsModalOpen(true);
         } catch (error) {
             console.error('Error fetching invoices:', error);
@@ -34,7 +34,25 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
     };
 
     const handleDownloadPDF = async () => {
-        // Implementation for downloading PDF
+        try{
+            const response = await getInvoiceBillsByPortfolioId(portfolioId);
+            const invoices = response.data;
+
+            const doc = new jsPDF();
+            doc.text('Invoices', 10, 10);
+
+            invoices.forEach((invoice, index) => {
+                doc.text(`Invoice ${index + 1}`, 10, 20 + index * 10);
+                doc.text(`Amount: ${invoice.amount}`, 10, 30 + index * 10);
+                doc.text(`State: ${invoice.state}`, 10, 40 + index * 10);
+                doc.text(`Due date: ${invoice.dateTcea}`, 10, 50 + index * 10);
+                doc.text(`Portfolio ID: ${invoice.portfolioId}`, 10, 70 + index * 10);
+            });
+
+            doc.save('invoices.pdf');
+        } catch (error) {
+            console.error('Error downloading PDF:', error);
+        }
     };
 
     return (

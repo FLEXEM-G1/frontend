@@ -17,6 +17,7 @@ const VerCartera = () => {
     const [banks, setBanks] = useState([]);
     const [tceaResults, setTceaResults] = useState({});
     const [netDiscountedAmount, setNetDiscountedAmount] = useState({});
+    const [tceaAverage, setTceaAverage] = useState(0);
     const currencies = [
         { name: 'USD', code: 'USD' },
         { name: 'PEN', code: 'PEN' },
@@ -68,6 +69,18 @@ const VerCartera = () => {
             setTceaResults({ ...tceaResults, [selectedPortfolio._id]: response.tcea });
             setNetDiscountedAmount({ ...netDiscountedAmount, [selectedPortfolio._id]: response.netDiscountedAmount });
             setIsTceaModalOpen(false);
+        } catch (error) {
+            console.error('Error calculating TCEA:', error);
+        }
+    };
+
+    const calculateTceaAverage = async () => {
+        try {
+            const response = await calculateTceaForPortfolio(selectedPortfolio._id, tceaDetails);
+            const newTcea = response.tcea;
+            const totalTcea = tceaAverage * portfolios.length + newTcea;
+            const avg = totalTcea / (portfolios.length + 1);
+            setTceaAverage(avg);
         } catch (error) {
             console.error('Error calculating TCEA:', error);
         }
@@ -163,10 +176,10 @@ const VerCartera = () => {
                                         openTceaModal={openTceaModal}
                                     />
                                     {tceaResults[portfolio._id] && (
-                                        <p>TCEA: {tceaResults[portfolio._id]}</p>
+                                        <p>TCEA: {tceaResults[portfolio._id].toFixed(2)} </p>
                                     )}
                                     {netDiscountedAmount[portfolio._id] && (
-                                        <p>Monto Neto Descontado: {netDiscountedAmount[portfolio._id]}</p>
+                                        <p>Monto Neto Descontado: {netDiscountedAmount[portfolio._id].toFixed(2)}</p>
                                     )}
                                 </div>
                             ) : (

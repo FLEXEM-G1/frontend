@@ -17,7 +17,7 @@ export const getPortfolioById = async (id) => {
 };
 export const createPortfolio = async (portfolio) => {
     try {
-        const response = await http.post('/portfolios', portfolio);
+        const response = await http.post('/portfolios', {...portfolio, invoices: []});
         return response.data;
     } catch (error) {
         console.error('Error creating portfolio:', error);

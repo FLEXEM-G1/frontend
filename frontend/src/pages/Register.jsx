@@ -1,4 +1,3 @@
-// frontend/src/pages/Register.jsx
 import React, { useState } from 'react';
 import './Register.css';
 import { Link, useNavigate } from 'react-router-dom';
@@ -22,6 +21,8 @@ const Register = () => {
         }
         try {
             await signUp({ email, password, name, phone, address });
+            localStorage.setItem('name', name);
+            localStorage.setItem('email', email);
             navigate('/login');
         } catch (error) {
             console.error('Error during registration:', error);

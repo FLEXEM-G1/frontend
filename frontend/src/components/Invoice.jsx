@@ -8,14 +8,12 @@ const Invoice = ({ record }) => {
         const fetchPortfolio = async () => {
             try {
                 const response = await getPortfolioById(record.portfolioId);
-                setPortfolio(response);
+                setPortfolio(response.data);
             } catch (error) {
                 console.error('Error fetching portfolio:', error);
             }
         };
-        if (record && record.portfolioId) {
-            fetchPortfolio().then(r => r).catch(e => e);
-        }
+        fetchPortfolio().then(r => r).catch(e => e);
     }, [record]);
 
     const getBackgroundColor = (status) => {
@@ -42,8 +40,9 @@ const Invoice = ({ record }) => {
             <p>Tipo: {record.type || 'N/A'}</p>
             <p>Fecha de Emisión: {record.issueDate ? new Date(record.issueDate).toLocaleDateString() : 'N/A'}</p>
             <p>Fecha de Expiración: {record.expirationDate ? new Date(record.expirationDate).toLocaleDateString() : 'N/A'}</p>
-            <p>Estado: {record.state || 'N/A'}</p>
-            <p>TCEA: {record.tcea}</p>
+            <p>RUC/DNI: {record.rucDni || 'N/A'}</p>
+            <p>Razón Social: {record.razSocNam || 'N/A'}</p>
+            <p>TCEA: {record.tcea.toFixed(2)}</p>
         </div>
     );
 };
