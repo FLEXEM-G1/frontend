@@ -116,7 +116,7 @@ const Register = () => {
                 <div className="login-redirect">
                     <p>¿Ya te encuentras registrado?</p>
                     <Link to="/login">
-                        <button type="button">INICIAR SESIÓN</button>
+                        <button type="register-button">INICIAR SESIÓN</button>
                     </Link>
                 </div>
             </div>

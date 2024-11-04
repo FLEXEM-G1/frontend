@@ -23,8 +23,8 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
     });
 
     const invoiceTypes = [
-        { name: 'Invoice', code: 'Invoice' },
-        { name: 'Bill', code: 'Bill' }
+        { name: 'Factura', code: 'Invoice' },
+        { name: 'Letra', code: 'Bill' }
     ];
 
     useEffect(() => {
@@ -88,7 +88,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
             <Sidebar />
             <div className="content">
                 <h1>Generar Letras Facturas</h1>
-                <button onClick={() => setIsModalOpen(true)}>Create Invoice Bill</button>
+                <button onClick={() => setIsModalOpen(true)}>Crear letra/factura</button>
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                     <form className="form-container" onSubmit={handleCreateInvoiceBill}>
                         <div className="form-group">
@@ -105,7 +105,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="invoiceBillNumber">Invoice Bill Number</label>
+                            <label htmlFor="invoiceBillNumber">Número de letra/factura</label>
                             <input
                                 type="text"
                                 name="invoiceBillNumber"
@@ -116,7 +116,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="type">Type</label>
+                            <label htmlFor="type">Tipo</label>
                             <Dropdown
                                 id="type"
                                 value={invoiceTypes.find(type => type.code === newInvoiceBill.type)}
@@ -124,7 +124,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                                 options={invoiceTypes}
                                 optionLabel="name"
                                 showClear
-                                placeholder="Select Type"
+                                placeholder="Selecciona el tipo"
                                 className="w-full md:w-14rem"
                                 required
                             />
@@ -152,18 +152,19 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="amount">Amount</label>
+                            <label htmlFor="amount">Cantidad</label>
                             <input
                                 type="number"
                                 name="amount"
                                 value={newInvoiceBill.amount}
                                 onChange={handleChange}
                                 placeholder="Amount"
+                                min="1"
                                 required
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="currency">Currency</label>
+                            <label htmlFor="currency">Moneda</label>
                             <input
                                 type="text"
                                 name="currency"
@@ -175,7 +176,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="issueDate">Issue Date</label>
+                            <label htmlFor="issueDate">Fecha de emisión</label>
                             <input
                                 type="date"
                                 name="issueDate"
@@ -186,7 +187,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="expirationDate">Expiration Date</label>
+                            <label htmlFor="expirationDate">Fecha de expiración</label>
                             <input
                                 type="date"
                                 name="expirationDate"
@@ -196,7 +197,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                                 required
                             />
                         </div>
-                        <button type="submit">Create Invoice Bill</button>
+                        <button type="submit">Crear factura/letra</button>
                     </form>
                 </Modal>
             </div>

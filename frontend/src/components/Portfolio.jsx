@@ -1,14 +1,20 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
-import {calculateTceaForPortfolio, deletePortfolio} from '../services/portfolioService';
+import { calculateTceaForPortfolio, deletePortfolio } from '../services/portfolioService';
 import Invoice from './Invoice';
 import Modal from './Modal';
-import { getInvoiceBillsByPortfolioId } from '../services/invoiceBillService.js';
+import { deleteInvoiceBill, getInvoiceBillsByPortfolioId } from '../services/invoiceBillService.js';
 import JsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelete }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [invoices, setInvoices] = useState([]);
+    const [tcea, setTcea] = useState(null);
+    const [netDiscountedAmount, setNetDiscountedAmount] = useState(null);
+    const [isTceaModalOpen, setIsTceaModalOpen] = useState(false);
+    const tableColumn = ["Factura", "Cantidad", "Fecha de vencimiento", "RUC/DNI", "TCEA", "Monto descontado"];
+    const tableRows = [];
 
     const toggleDetails = async () => {
         setIsOpen(!isOpen);
@@ -24,10 +30,29 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
         }
     };
 
+    const showTCEAcalculated = async () => {
+        try {
+            const response = await calculateTceaForPortfolio(portfolioId);
+            setTcea(response.data.tcea);
+            setNetDiscountedAmount(response.data.netDiscountedAmount);
+            setIsTceaModalOpen(true);
+        } catch (error) {
+            console.error('Error calculating TCEA:', error);
+        }
+    };
+
     const handleDeletePortfolio = async () => {
+        for (const invoice of invoices) {
+            try {
+                await deleteInvoiceBill(invoice._id);
+            } catch (error) {
+                console.error('Error deleting invoice:', error);
+            }
+        }
         try {
             await deletePortfolio(portfolioId);
             onDelete(portfolioId);
+            window.location.reload();
         } catch (error) {
             console.error('Error deleting portfolio:', error);
         }
@@ -36,20 +61,35 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
     const handleDownloadPDF = async () => {
         try {
             const response = await getInvoiceBillsByPortfolioId(portfolioId);
+
             const invoices = response.data;
 
             const doc = new JsPDF();
             doc.text('Invoices', 10, 10);
 
             invoices.forEach((invoice, index) => {
-                const yOffset = 30 + index * 80;
-                doc.text(`Invoice ${index + 1}`, 10, yOffset);
-                doc.text(`Amount: ${invoice.amount}`, 10, yOffset + 10);
-                doc.text(`Due date: ${invoice.dateTcea}`, 10, yOffset + 20);
-                doc.text( 'RUC/DNI: ' + invoice.rucDni, 10, yOffset + 30);
-                doc.text(`Due date: ${invoice.dateTcea}`, 10, yOffset + 40);
-                doc.text(`TCEA: ${invoice.tcea}`, 10, yOffset + 50);
+                const invoiceData = [
+                    index + 1,
+                    invoice.amount,
+                    invoice.dateTcea,
+                    invoice.rucDni,
+                    invoice.tcea.toFixed(3),
+                    invoice.netDiscountedAmount.toFixed(3)
+                ];
+                tableRows.push(invoiceData);
             });
+
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 20,
+                theme: 'grid',
+                headStyles: { fillColor: [211, 29, 84] },
+                styles: { halign: 'center' }
+            });
+
+            doc.text(`Total Net Discounted Amount: ${netDiscountedAmount !== null ? (bankCurrency === 'USD' ? `$${netDiscountedAmount}` : `S/.${netDiscountedAmount}`) : 'N/A'}`, 10, doc.autoTable.previous.finalY + 10);
+            doc.text(`Total TCEA: ${tceaResults !== null ? tceaResults : 'N/A'}`, 10, doc.autoTable.previous.finalY + 20);
             doc.save('invoices.pdf');
         } catch (error) {
             console.error('Error downloading PDF:', error);
@@ -67,8 +107,9 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
                 <div style={styles.walletContent}>
                     <button onClick={() => openTceaModal(portfolioId)}>Calcular TCEA</button>
                     <button onClick={openInvoicesModal}>Ver letras/facturas</button>
-                    <button onClick={handleDownloadPDF}>Download PDF</button>
-                    <button onClick={handleDeletePortfolio}>Delete Portfolio</button>
+                    <button onClick={handleDownloadPDF}>Descargar PDF</button>
+                    <button onClick={handleDeletePortfolio}>Borrar Portafolio</button>
+                    <button onClick={showTCEAcalculated}>TCEA calculada</button>
                 </div>
             )}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
@@ -79,7 +120,21 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
                             <Invoice key={invoice._id} record={invoice} />
                         ))
                     ) : (
-                        <p>No invoices available</p>
+                        <p>No letras/facturas disponibles</p>
+                    )}
+                </div>
+            </Modal>
+            <Modal isOpen={isTceaModalOpen} onClose={() => setIsTceaModalOpen(false)}>
+                <div style={styles.tceaContent}>
+                    <h2>TCEA Calculada</h2>
+                    {tcea !== null && (
+                        <p>TCEA: {tcea}</p>
+                    )}
+                    {netDiscountedAmount !== null && (
+                        <p>
+                            Monto Neto Descontado:
+                            {bankCurrency === 'USD' ? `$${netDiscountedAmount}` : `S/.${netDiscountedAmount}`}
+                        </p>
                     )}
                 </div>
             </Modal>
@@ -125,6 +180,10 @@ const styles: { [key: string]: CSSProperties } = {
         borderRadius: '5px',
     },
     invoicesContent: {
+        padding: '20px',
+        color: '#000',
+    },
+    tceaContent: {
         padding: '20px',
         color: '#000',
     },

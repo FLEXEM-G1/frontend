@@ -17,8 +17,7 @@ export const getInvoiceBillById = async (id) => {
 
 export const getInvoiceBillsByPortfolioId = async (portfolioId) => {
     try {
-        const response = await http.get(`/portfolio/${portfolioId}/invoiceBills`);
-        return response;
+        return await http.get(`/portfolio/${portfolioId}/invoiceBills`);
     } catch (error) {
         console.error('Error fetching invoices by portfolio ID:', error);
         throw error;

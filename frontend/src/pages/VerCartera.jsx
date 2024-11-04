@@ -22,6 +22,7 @@ const VerCartera = () => {
         { name: 'USD', code: 'USD' },
         { name: 'PEN', code: 'PEN' },
     ];
+
     useEffect(() => {
         const fetchPortfolios = async () => {
             const response = await getAllPortfolios();
@@ -68,22 +69,25 @@ const VerCartera = () => {
             console.log('TCEA response:', response);
             setTceaResults({ ...tceaResults, [selectedPortfolio._id]: response.tcea });
             setNetDiscountedAmount({ ...netDiscountedAmount, [selectedPortfolio._id]: response.netDiscountedAmount });
+            calculateTceaAverage();
             setIsTceaModalOpen(false);
         } catch (error) {
             console.error('Error calculating TCEA:', error);
         }
     };
 
-    const calculateTceaAverage = async () => {
-        try {
-            const response = await calculateTceaForPortfolio(selectedPortfolio._id, tceaDetails);
-            const newTcea = response.tcea;
-            const totalTcea = tceaAverage * portfolios.length + newTcea;
-            const avg = totalTcea / (portfolios.length + 1);
-            setTceaAverage(avg);
-        } catch (error) {
-            console.error('Error calculating TCEA:', error);
-        }
+    const handleDeletePortfolio = (portfolioId) => {
+        setPortfolios(portfolios.filter(portfolio => portfolio._id !== portfolioId));
+    };
+
+    const calculateTceaAverage = () => {
+        if (portfolios.length === 0) return;
+        const totalTcea = portfolios.reduce((acc, portfolio) => {
+            const tcea = tceaResults[portfolio._id];
+            return acc + (tcea ? tcea : 0);
+        }, 0);
+        const avg = totalTcea / portfolios.length;
+        setTceaAverage(avg);
     };
 
     const openTceaModal = (portfolioId) => {
@@ -98,12 +102,13 @@ const VerCartera = () => {
             <div className="content">
                 <div className="header-container">
                     <h1>Ver Cartera</h1>
-                    <button className="create-portfolio-button" onClick={() => setIsModalOpen(true)}>Create Portfolio</button>
+                    <button className="create-portfolio-button" onClick={() => setIsModalOpen(true)}>Crear Portafolio
+                    </button>
                 </div>
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                     <form onSubmit={handleCreatePortfolio}>
-                        <div className="form-group">
-                            <label htmlFor="name">Name</label>
+                        <div className="form-group-portfolio">
+                            <label htmlFor="name">Nombre: </label>
                             <input
                                 type="text"
                                 id="name"
@@ -113,8 +118,7 @@ const VerCartera = () => {
                                 required
                             />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="currency">Currency</label>
+                        <div className="form-group-portfolio">
                             <Dropdown
                                 id="currency"
                                 name="currency"
@@ -122,19 +126,19 @@ const VerCartera = () => {
                                 onChange={handleCurrencyChange}
                                 options={currencies}
                                 optionLabel="name"
-                                placeholder="Select Currency"
+                                placeholder="Selecciona la moneda"
                                 className="w-full md:w-14rem"
                                 required
                             />
                         </div>
-                        <button type="submit">Create Portfolio</button>
+                        <button type="submit">Crear Portafolio</button>
                     </form>
                 </Modal>
                 <Modal isOpen={isTceaModalOpen} onClose={() => setIsTceaModalOpen(false)}>
                     <div>
-                        <h2>Calculate TCEA</h2>
+                        <h2>Calcular TCEA</h2>
                         <div className="form-group">
-                            <label htmlFor="bankId">Bank</label>
+                            <label htmlFor="bankId">Banco</label>
                             <select
                                 id="bankId"
                                 name="bankId"
@@ -145,23 +149,23 @@ const VerCartera = () => {
                                 <option value="">Select Bank</option>
                                 {banks.map((bank) => (
                                     <option key={bank._id} value={bank._id}>
-                                    {bank.name}
+                                        {bank.name}
                                     </option>
                                 ))}
                             </select>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="dateTcea">Payment Date</label>
+                            <label htmlFor="dateTcea">Fecha de pago</label>
                             <input
                                 type="date"
                                 id="dateTcea"
                                 name="dateTcea"
                                 value={tceaDetails.dateTcea}
-                                onChange={(e) => setTceaDetails({ ...tceaDetails, dateTcea: e.target.value })}
+                                onChange={(e) => setTceaDetails({...tceaDetails, dateTcea: e.target.value})}
                                 required
                             />
                         </div>
-                        <button onClick={handleCalculateTcea}>Calculate TCEA</button>
+                        <button onClick={handleCalculateTcea}>Calcular TCEA</button>
                     </div>
                 </Modal>
                 <div className="wallets-container">
@@ -174,20 +178,21 @@ const VerCartera = () => {
                                         bankCurrency={portfolio.currency}
                                         portfolioId={portfolio._id}
                                         openTceaModal={openTceaModal}
+                                        onDelete={handleDeletePortfolio}
                                     />
                                     {tceaResults[portfolio._id] && (
-                                        <p>TCEA: {tceaResults[portfolio._id].toFixed(2)} </p>
+                                        <p>TCEA: {tceaResults[portfolio._id].toFixed(3)} </p>
                                     )}
                                     {netDiscountedAmount[portfolio._id] && (
-                                        <p>Monto Neto Descontado: {netDiscountedAmount[portfolio._id].toFixed(2)}</p>
+                                        <p>Monto descontado neto: {netDiscountedAmount[portfolio._id].toFixed(3)} </p>
                                     )}
                                 </div>
                             ) : (
-                                <p key={portfolio._id || Math.random()}>Invalid portfolio data</p>
+                                <p key={portfolio._id || Math.random()}>Información inválida del portafolio</p>
                             )
                         ))
                     ) : (
-                        <p>No portfolios available</p>
+                        <p>No hay portafolios disponibles</p>
                     )}
                 </div>
             </div>

@@ -53,6 +53,7 @@ const Menu = () => {
 
                 setTotalInvoices(invoices.length);
                 setPendingInvoices(statusCounts.Pending);
+                setTceaAverage(invoices.reduce((acc, invoice) => acc + invoice.tcea, 0) / invoices.length);
 
             } catch (error) {
                 console.error('Error fetching invoices:', error);
@@ -62,7 +63,6 @@ const Menu = () => {
         fetchInvoices().then(r => console.log('Invoices fetched'));
     }, []);
 
-    const values = pieChartData.datasets[0].data;
     const location = useLocation();
 
     return (
@@ -81,7 +81,7 @@ const Menu = () => {
                         <div className="text-container">
                             <div className="rectangleText">Total Letras/Facturas: {totalInvoices}</div>
                             <div className="rectangleText">Letras a vencer: {pendingInvoices}</div>
-                            <div className="rectangleText">TCEA Promedio: {tceaAverage.toFixed(2)}</div>
+                            <div className="rectangleText">TCEA Promedio: {tceaAverage.toFixed(3)}</div>
                         </div>
                         <div className="chart-container">
                             <PieChart data={pieChartData} />
