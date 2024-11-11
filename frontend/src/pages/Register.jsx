@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './Register.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { signUp } from '../services/userService';
+import RegisterActions from "../components/RegisterActions.jsx";
 
 const Register = () => {
     const navigate = useNavigate();
@@ -21,8 +22,6 @@ const Register = () => {
         }
         try {
             await signUp({ email, password, name, phone, address });
-            localStorage.setItem('name', name);
-            localStorage.setItem('email', email);
             navigate('/login');
         } catch (error) {
             console.error('Error during registration:', error);
@@ -30,8 +29,8 @@ const Register = () => {
     };
 
     return (
-        <div className="home">
-            <div className="register-section">
+        <div className="register-container">
+            <div className="register-form">
                 <h2>REGISTRAR USUARIO</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -111,17 +110,10 @@ const Register = () => {
                             required
                         />
                     </div>
-                    <button type="submit">REGISTRARSE</button>
                 </form>
-                <div className="login-redirect">
-                    <p>¿Ya te encuentras registrado?</p>
-                    <Link to="/login">
-                        <button type="register-button">INICIAR SESIÓN</button>
-                    </Link>
-                </div>
             </div>
-            <div className="profile-section">
-                <div className="profile-circle"></div>
+            <div className="register-actions-container">
+                <RegisterActions />
             </div>
         </div>
     );

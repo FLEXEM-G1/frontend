@@ -19,7 +19,6 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
         currency: '',
         issueDate: '',
         expirationDate: '',
-        state: 'Pending',
     });
 
     const invoiceTypes = [
@@ -75,7 +74,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                 currency: '',
                 issueDate: '',
                 expirationDate: '',
-                state: 'Pending',
+                state: 'Not Capitalized',
             });
             setIsModalOpen(false);
         } catch (error) {
@@ -92,14 +91,14 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                     <form className="form-container" onSubmit={handleCreateInvoiceBill}>
                         <div className="form-group">
-                            <label htmlFor="portfolioId">Portfolio</label>
+                            <label htmlFor="portfolioId">Portafolio</label>
                             <Dropdown
                                 id="portfolioId"
                                 value={portfolios.find(portfolio => portfolio._id === newInvoiceBill.portfolioId)}
                                 onChange={handlePortfolioChange}
                                 options={portfolios}
                                 optionLabel="name"
-                                placeholder="Select Portfolio"
+                                placeholder="Selecciona un portafolio"
                                 className="w-full md:w-14rem"
                                 required
                             />

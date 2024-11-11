@@ -1,7 +1,6 @@
-// frontend/src/components/InvoiceList.jsx
 import React, { useEffect, useState } from 'react';
 import Invoice from './Invoice';
-import {deleteInvoiceBill, updateInvoiceBill} from "../services/invoiceBillService.js";
+import { deleteInvoiceBill, updateInvoiceBill } from '../services/invoiceBillService.js';
 
 const InvoiceList = ({ invoices }) => {
     const [filter, setFilter] = useState('Todos');
@@ -17,12 +16,10 @@ const InvoiceList = ({ invoices }) => {
 
     const getColor = (status) => {
         switch (status) {
-            case 'Pending':
+            case 'Not Capitalized':
                 return '#46D73D';
-            case 'Payte':
+            case 'Capitalized':
                 return '#45B0E4';
-            case 'Expired':
-                return '#E84949';
             default:
                 return '#ccc';
         }
@@ -45,14 +42,11 @@ const InvoiceList = ({ invoices }) => {
                 <button onClick={() => setFilter('Todos')}>
                     <span style={{ ...styles.colorBox, backgroundColor: getColor('Todos') }}></span> Todos
                 </button>
-                <button onClick={() => setFilter('Pending')}>
-                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Pending') }}></span> Pendiente
+                <button onClick={() => setFilter('Not Capitalized')}>
+                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Not Capitalized') }}></span> No Capitalizado
                 </button>
-                <button onClick={() => setFilter('Expired')}>
-                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Expired') }}></span> Vencido
-                </button>
-                <button onClick={() => setFilter('Payte')}>
-                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Payte') }}></span> Pagado
+                <button onClick={() => setFilter('Capitalized')}>
+                    <span style={{ ...styles.colorBox, backgroundColor: getColor('Capitalized') }}></span> Capitalizado
                 </button>
             </div>
 
@@ -65,20 +59,8 @@ const InvoiceList = ({ invoices }) => {
 
             <button onClick={() => {
                 const updatedInvoices = filteredInvoices.map(invoice => {
-                    let newState;
-                    switch (invoice.state) {
-                        case 'Pending':
-                            newState = 'Payte';
-                            break;
-                        case 'Payte':
-                            newState = 'Expired';
-                            break;
-                        case 'Expired':
-                            deleteInvoiceBill(invoice._id);
-                        default:
-                            newState = 'Pending';
-                    }
-                    return {...invoice, state: newState};
+                    const newState = invoice.state === 'Not Capitalized' ? 'Capitalized' : 'Not Capitalized';
+                    return { ...invoice, state: newState };
                 });
                 setInvoices(updatedInvoices);
             }}>Actualizar Estados

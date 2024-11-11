@@ -3,17 +3,18 @@ import { calculateTceaForPortfolio, deletePortfolio } from '../services/portfoli
 import Invoice from './Invoice';
 import Modal from './Modal';
 import { deleteInvoiceBill, getInvoiceBillsByPortfolioId } from '../services/invoiceBillService.js';
+import {toast} from "react-toastify";
 import JsPDF from 'jspdf';
 import 'jspdf-autotable';
+import 'react-toastify/dist/ReactToastify.css';
 
-const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelete }) => {
+const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelete, tcea, netDiscountedAmount }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
     const [invoices, setInvoices] = useState([]);
-    const [tcea, setTcea] = useState(null);
-    const [netDiscountedAmount, setNetDiscountedAmount] = useState(null);
     const [isTceaModalOpen, setIsTceaModalOpen] = useState(false);
-    const tableColumn = ["Factura", "Cantidad", "Fecha de vencimiento", "RUC/DNI", "TCEA", "Monto descontado"];
+    const tableColumn = ["Factura", "Cantidad", "Fecha de vencimiento", "RUC/DNI", "TCEA", "Moneda", "Monto descontado"];
     const tableRows = [];
 
     const toggleDetails = async () => {
@@ -33,8 +34,8 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
     const showTCEAcalculated = async () => {
         try {
             const response = await calculateTceaForPortfolio(portfolioId);
-            setTcea(response.data.tcea);
-            setNetDiscountedAmount(response.data.netDiscountedAmount);
+            tcea(response.data.tcea);
+            netDiscountedAmount(response.data.netDiscountedAmount);
             setIsTceaModalOpen(true);
         } catch (error) {
             console.error('Error calculating TCEA:', error);
@@ -42,6 +43,22 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
     };
 
     const handleDeletePortfolio = async () => {
+        try {
+            const response = await getInvoiceBillsByPortfolioId(portfolioId);
+            if (response.data.length > 0) {
+                setInvoices(response.data);
+                setIsWarningModalOpen(true);
+            } else {
+                await deletePortfolio(portfolioId);
+                onDelete(portfolioId);
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Error deleting portfolio:', error);
+        }
+    };
+
+    const confirmDeletePortfolio = async () => {
         for (const invoice of invoices) {
             try {
                 await deleteInvoiceBill(invoice._id);
@@ -52,28 +69,30 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
         try {
             await deletePortfolio(portfolioId);
             onDelete(portfolioId);
-            window.location.reload();
+            toast.success('El portafolio ha sido eliminado');
         } catch (error) {
             console.error('Error deleting portfolio:', error);
+            toast.error('Error al eliminar el portafolio');
         }
     };
 
     const handleDownloadPDF = async () => {
         try {
             const response = await getInvoiceBillsByPortfolioId(portfolioId);
-
             const invoices = response.data;
 
             const doc = new JsPDF();
             doc.text('Invoices', 10, 10);
 
             invoices.forEach((invoice, index) => {
+                const currencySymbol = bankCurrency === 'USD' ? '$' : 'S/.';
                 const invoiceData = [
                     index + 1,
                     invoice.amount,
                     invoice.dateTcea,
                     invoice.rucDni,
                     invoice.tcea.toFixed(3),
+                    currencySymbol,
                     invoice.netDiscountedAmount.toFixed(3)
                 ];
                 tableRows.push(invoiceData);
@@ -88,8 +107,11 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
                 styles: { halign: 'center' }
             });
 
-            doc.text(`Total Net Discounted Amount: ${netDiscountedAmount !== null ? (bankCurrency === 'USD' ? `$${netDiscountedAmount}` : `S/.${netDiscountedAmount}`) : 'N/A'}`, 10, doc.autoTable.previous.finalY + 10);
-            doc.text(`Total TCEA: ${tceaResults !== null ? tceaResults : 'N/A'}`, 10, doc.autoTable.previous.finalY + 20);
+            const totalNetDiscountedAmount = netDiscountedAmount !== null && netDiscountedAmount !== undefined ? (bankCurrency === 'USD' ? `$${netDiscountedAmount.toFixed(3)}` : `S/.${netDiscountedAmount.toFixed(3)}`) : 'N/A';
+            const totalTcea = tcea !== null && tcea !== undefined ? tcea.toFixed(3) : 'N/A';
+
+            doc.text(`Total Net Discounted Amount: ${totalNetDiscountedAmount}`, 10, doc.autoTable.previous.finalY + 10);
+            doc.text(`Total TCEA: ${totalTcea}%`, 10, doc.autoTable.previous.finalY + 20);
             doc.save('invoices.pdf');
         } catch (error) {
             console.error('Error downloading PDF:', error);
@@ -109,7 +131,6 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
                     <button onClick={openInvoicesModal}>Ver letras/facturas</button>
                     <button onClick={handleDownloadPDF}>Descargar PDF</button>
                     <button onClick={handleDeletePortfolio}>Borrar Portafolio</button>
-                    <button onClick={showTCEAcalculated}>TCEA calculada</button>
                 </div>
             )}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
@@ -122,6 +143,14 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
                     ) : (
                         <p>No letras/facturas disponibles</p>
                     )}
+                </div>
+            </Modal>
+            <Modal isOpen={isWarningModalOpen} onClose={() => setIsWarningModalOpen(false)}>
+                <div style={styles.warningContent}>
+                    <h2>Advertencia</h2>
+                    <p>Este portafolio tiene facturas asociadas. Al eliminar el portafolio, también se eliminarán las facturas. ¿Desea continuar?</p>
+                    <button onClick={confirmDeletePortfolio}>Aceptar</button>
+                    <button onClick={() => setIsWarningModalOpen(false)}>Cancelar</button>
                 </div>
             </Modal>
             <Modal isOpen={isTceaModalOpen} onClose={() => setIsTceaModalOpen(false)}>
@@ -184,6 +213,10 @@ const styles: { [key: string]: CSSProperties } = {
         color: '#000',
     },
     tceaContent: {
+        padding: '20px',
+        color: '#000',
+    },
+    warningContent: {
         padding: '20px',
         color: '#000',
     },

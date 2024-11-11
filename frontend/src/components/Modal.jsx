@@ -1,4 +1,3 @@
-// frontend/src/components/Modal.jsx
 import React from 'react';
 import './Modal.css';
 

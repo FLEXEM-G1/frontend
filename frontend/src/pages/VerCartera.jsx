@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createPortfolio, getAllPortfolios, calculateTceaForPortfolio } from '../services/portfolioService';
 import { getAllBanks } from '../services/bankService';
+import {ToastContainer, toast} from "react-toastify";
 import Portfolio from '../components/Portfolio.jsx';
 import Modal from '../components/Modal';
 import Sidebar from '../components/Sidebar';
 import { Dropdown } from 'primereact/dropdown';
 import './VerCartera.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 const VerCartera = () => {
     const [portfolios, setPortfolios] = useState([]);
@@ -64,20 +66,20 @@ const VerCartera = () => {
 
     const handleCalculateTcea = async () => {
         try {
-            console.log('Calculating TCEA for portfolio:', selectedPortfolio._id, tceaDetails);
             const response = await calculateTceaForPortfolio(selectedPortfolio._id, tceaDetails);
-            console.log('TCEA response:', response);
-            setTceaResults({ ...tceaResults, [selectedPortfolio._id]: response.tcea });
-            setNetDiscountedAmount({ ...netDiscountedAmount, [selectedPortfolio._id]: response.netDiscountedAmount });
-            calculateTceaAverage();
-            setIsTceaModalOpen(false);
+            setTceaResults({ tceaResults, [selectedPortfolio._id]: response.tcea });
+            setNetDiscountedAmount({ netDiscountedAmount, [selectedPortfolio._id]: response.netDiscountedAmount });
+            setIsTceaModalOpen(true);
+            toast.success(`TCEA: ${response.tcea}, Monto Neto Descontado: ${response.netDiscountedAmount}`);
         } catch (error) {
             console.error('Error calculating TCEA:', error);
+            toast.error('Error calculating TCEA');
         }
     };
 
     const handleDeletePortfolio = (portfolioId) => {
         setPortfolios(portfolios.filter(portfolio => portfolio._id !== portfolioId));
+
     };
 
     const calculateTceaAverage = () => {
@@ -102,8 +104,7 @@ const VerCartera = () => {
             <div className="content">
                 <div className="header-container">
                     <h1>Ver Cartera</h1>
-                    <button className="create-portfolio-button" onClick={() => setIsModalOpen(true)}>Crear Portafolio
-                    </button>
+                    <button className="create-portfolio-button" onClick={() => setIsModalOpen(true)}>Crear Portafolio</button>
                 </div>
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                     <form onSubmit={handleCreatePortfolio}>
@@ -179,13 +180,9 @@ const VerCartera = () => {
                                         portfolioId={portfolio._id}
                                         openTceaModal={openTceaModal}
                                         onDelete={handleDeletePortfolio}
+                                        tcea={tceaResults[portfolio._id]}
+                                        netDiscountedAmount={netDiscountedAmount[portfolio._id]}
                                     />
-                                    {tceaResults[portfolio._id] && (
-                                        <p>TCEA: {tceaResults[portfolio._id].toFixed(3)} </p>
-                                    )}
-                                    {netDiscountedAmount[portfolio._id] && (
-                                        <p>Monto descontado neto: {netDiscountedAmount[portfolio._id].toFixed(3)} </p>
-                                    )}
                                 </div>
                             ) : (
                                 <p key={portfolio._id || Math.random()}>Información inválida del portafolio</p>
@@ -196,8 +193,10 @@ const VerCartera = () => {
                     )}
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 };
 
 export default VerCartera;
+

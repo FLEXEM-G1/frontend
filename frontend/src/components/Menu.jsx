@@ -14,17 +14,17 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Menu = () => {
     const [pieChartData, setPieChartData] = useState({
-        labels: ['Pending', 'Payte', 'Expired'],
+        labels: ['Not Capitalized', 'Capitalized'],
         datasets: [
             {
                 label: '# of Invoices',
-                data: [0, 0, 0],
-                backgroundColor: ['#46D73D', '#45B0E4', '#E84949'],
+                data: [0, 0],
+                backgroundColor: ['#46D73D', '#45B0E4'],
             },
         ],
     });
     const [totalInvoices, setTotalInvoices] = useState(0);
-    const [pendingInvoices, setPendingInvoices] = useState(0);
+    const [notCapitalizedInvoices, setNotCapitalizedInvoices] = useState(0);
     const [tceaAverage, setTceaAverage] = useState(0);
 
     useEffect(() => {
@@ -32,7 +32,7 @@ const Menu = () => {
             try {
                 const response = await getAllInvoiceBills();
                 const invoices = response.data;
-                const statusCounts = { Pending: 0, Payte: 0, Expired: 0 };
+                const statusCounts = { 'Not Capitalized': 0, 'Capitalized': 0 };
 
                 invoices.forEach(invoice => {
                     if (statusCounts[invoice.state] !== undefined) {
@@ -41,18 +41,18 @@ const Menu = () => {
                 });
 
                 setPieChartData({
-                    labels: ['Pending', 'Payte', 'Expired'],
+                    labels: ['Not Capitalized', 'Capitalized'],
                     datasets: [
                         {
                             label: '# of Invoices',
-                            data: [statusCounts.Pending, statusCounts.Payte, statusCounts.Expired],
-                            backgroundColor: ['#46D73D', '#45B0E4', '#E84949'],
+                            data: [statusCounts['Not Capitalized'], statusCounts['Capitalized']],
+                            backgroundColor: ['#46D73D', '#45B0E4'],
                         },
                     ],
                 });
 
                 setTotalInvoices(invoices.length);
-                setPendingInvoices(statusCounts.Pending);
+                setNotCapitalizedInvoices(statusCounts['Not Capitalized']);
                 setTceaAverage(invoices.reduce((acc, invoice) => acc + invoice.tcea, 0) / invoices.length);
 
             } catch (error) {
@@ -80,7 +80,7 @@ const Menu = () => {
                     <div className="main-container">
                         <div className="text-container">
                             <div className="rectangleText">Total Letras/Facturas: {totalInvoices}</div>
-                            <div className="rectangleText">Letras a vencer: {pendingInvoices}</div>
+                            <div className="rectangleText">No Capitalizadas: {notCapitalizedInvoices}</div>
                             <div className="rectangleText">TCEA Promedio: {tceaAverage.toFixed(3)}</div>
                         </div>
                         <div className="chart-container">
