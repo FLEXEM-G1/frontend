@@ -1,7 +1,6 @@
-// frontend/src/pages/MisRegistros.jsx
 import React, { useEffect, useState } from 'react';
 import InvoiceList from '../components/InvoiceList';
-import {getAllInvoiceBills, updateInvoiceBill} from '../services/invoiceBillService';
+import {getAllInvoiceBills} from '../services/invoiceBillService';
 import Sidebar from '../components/Sidebar';
 import './MisRegistros.css';
 

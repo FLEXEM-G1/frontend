@@ -19,7 +19,6 @@ const VerCartera = () => {
     const [banks, setBanks] = useState([]);
     const [tceaResults, setTceaResults] = useState({});
     const [netDiscountedAmount, setNetDiscountedAmount] = useState({});
-    const [tceaAverage, setTceaAverage] = useState(0);
     const currencies = [
         { name: 'USD', code: 'USD' },
         { name: 'PEN', code: 'PEN' },
@@ -39,18 +38,8 @@ const VerCartera = () => {
         fetchBanks().then(r => r).catch(e => e);
     }, []);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setNewPortfolio({ ...newPortfolio, [name]: value });
-    };
-
     const handleCurrencyChange = (e) => {
         setNewPortfolio({ ...newPortfolio, currency: e.value.code });
-    };
-
-    const handleTceaChange = (e) => {
-        const { name, value } = e.target;
-        setTceaDetails({ ...tceaDetails, [name]: value });
     };
 
     const handleCreatePortfolio = async (e) => {
@@ -80,16 +69,6 @@ const VerCartera = () => {
     const handleDeletePortfolio = (portfolioId) => {
         setPortfolios(portfolios.filter(portfolio => portfolio._id !== portfolioId));
 
-    };
-
-    const calculateTceaAverage = () => {
-        if (portfolios.length === 0) return;
-        const totalTcea = portfolios.reduce((acc, portfolio) => {
-            const tcea = tceaResults[portfolio._id];
-            return acc + (tcea ? tcea : 0);
-        }, 0);
-        const avg = totalTcea / portfolios.length;
-        setTceaAverage(avg);
     };
 
     const openTceaModal = (portfolioId) => {
@@ -137,23 +116,19 @@ const VerCartera = () => {
                 </Modal>
                 <Modal isOpen={isTceaModalOpen} onClose={() => setIsTceaModalOpen(false)}>
                     <div>
-                        <h2>Calcular TCEA</h2>
+                        <h2>Simulador de TCEA</h2>
                         <div className="form-group">
                             <label htmlFor="bankId">Banco</label>
-                            <select
+                            <Dropdown
                                 id="bankId"
-                                name="bankId"
-                                value={tceaDetails.bankId}
-                                onChange={(e) => setTceaDetails({...tceaDetails, bankId: e.target.value})}
+                                value={banks.find(bank => bank._id === tceaDetails.bankId)}
+                                onChange={(e) => setTceaDetails({...tceaDetails, bankId: e.value._id})}
+                                options={banks}
+                                optionLabel="name"
+                                placeholder="Selecciona un banco"
+                                className="w-full md:w-14rem"
                                 required
-                            >
-                                <option value="">Select Bank</option>
-                                {banks.map((bank) => (
-                                    <option key={bank._id} value={bank._id}>
-                                        {bank.name}
-                                    </option>
-                                ))}
-                            </select>
+                            />
                         </div>
                         <div className="form-group">
                             <label htmlFor="dateTcea">Fecha de pago</label>

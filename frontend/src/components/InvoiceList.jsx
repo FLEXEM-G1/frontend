@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Invoice from './Invoice';
-import { deleteInvoiceBill, updateInvoiceBill } from '../services/invoiceBillService.js';
+import Modal from './Modal';
 
 const InvoiceList = ({ invoices }) => {
     const [filter, setFilter] = useState('Todos');
+    const [selectedInvoice, setSelectedInvoice] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         console.log('InvoiceList - invoices:', invoices);
@@ -25,15 +27,10 @@ const InvoiceList = ({ invoices }) => {
         }
     };
 
-    function setInvoices(updatedInvoices) {
-        updatedInvoices.forEach(invoice => {
-            updateInvoiceBill(invoice._id, invoice).then(response => {
-                console.log('Invoice updated:', response.data);
-            }).catch(error => {
-                console.error('Error updating invoice:', error);
-            });
-        });
-    }
+    const handleInvoiceClick = (invoice) => {
+        setSelectedInvoice(invoice);
+        setIsModalOpen(true);
+    };
 
     return (
         <div style={styles.container}>
@@ -51,20 +48,20 @@ const InvoiceList = ({ invoices }) => {
             </div>
 
             <div style={styles.invoiceList}>
-                {filteredInvoices.map((invoice) => {
-                    console.log('Portfolio id', invoice.portfolioId);
-                    return <Invoice key={invoice._id} record={invoice} />;
-                })}
+                {filteredInvoices.map((invoice) => (
+                    <div key={invoice._id} style={styles.invoice} onClick={() => handleInvoiceClick(invoice)}>
+                        <p>Factura: {invoice.invoiceBillNumber || 'N/A'}</p>
+                        <p>Monto: {invoice.amount || 'N/A'} {invoice.currency || ''}</p>
+                        <p>Tipo: {invoice.type || 'N/A'}</p>
+                    </div>
+                ))}
             </div>
 
-            <button onClick={() => {
-                const updatedInvoices = filteredInvoices.map(invoice => {
-                    const newState = invoice.state === 'Not Capitalized' ? 'Capitalized' : 'Not Capitalized';
-                    return { ...invoice, state: newState };
-                });
-                setInvoices(updatedInvoices);
-            }}>Actualizar Estados
-            </button>
+            {selectedInvoice && (
+                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <Invoice record={selectedInvoice} />
+                </Modal>
+            )}
         </div>
     );
 };
@@ -72,6 +69,8 @@ const InvoiceList = ({ invoices }) => {
 const styles = {
     container: {
         display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
     },
     sidebar: {
         width: '200px',
@@ -85,6 +84,16 @@ const styles = {
         flexDirection: 'column',
         padding: '20px',
         marginTop: '10px',
+        maxHeight: '400px',
+        overflowY: 'auto',
+    },
+    invoice: {
+        border: '1px solid #ccc',
+        borderRadius: '5px',
+        padding: '10px',
+        marginBottom: '10px',
+        cursor: 'pointer',
+        backgroundColor: '#fff',
     },
     colorBox: {
         display: 'inline-block',

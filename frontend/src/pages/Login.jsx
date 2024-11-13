@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './Login.css';
 import logo from '../assets/black-and-white-logo.png';
 import { useNavigate } from 'react-router-dom';
-import { signIn } from '../services/userService';
 
 const Login = ({ onLogin }) => {
     const navigate = useNavigate();
@@ -13,7 +12,6 @@ const Login = ({ onLogin }) => {
         event.preventDefault();
         console.log('Login attempt with email:', email, 'and password:', password);
         try {
-            const response = await signIn({ email, password });
             onLogin();
             navigate('/menu');
         } catch (error) {

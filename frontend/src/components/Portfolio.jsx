@@ -1,5 +1,5 @@
-import React, { useState, useEffect, CSSProperties } from 'react';
-import { calculateTceaForPortfolio, deletePortfolio } from '../services/portfolioService';
+import React, { useState, CSSProperties } from 'react';
+import {deletePortfolio } from '../services/portfolioService';
 import Invoice from './Invoice';
 import Modal from './Modal';
 import { deleteInvoiceBill, getInvoiceBillsByPortfolioId } from '../services/invoiceBillService.js';
@@ -14,7 +14,7 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
     const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
     const [invoices, setInvoices] = useState([]);
     const [isTceaModalOpen, setIsTceaModalOpen] = useState(false);
-    const tableColumn = ["Factura", "Cantidad", "Fecha de vencimiento", "RUC/DNI", "TCEA", "Moneda", "Monto descontado"];
+    const tableColumn = ["Factura", "Cantidad", "Fecha de vencimiento", "RUC/DNI", "Tipo", "TCEA", "Moneda", "Monto descontado"];
     const tableRows = [];
 
     const toggleDetails = async () => {
@@ -28,17 +28,6 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
             setIsModalOpen(true);
         } catch (error) {
             console.error('Error fetching invoices:', error);
-        }
-    };
-
-    const showTCEAcalculated = async () => {
-        try {
-            const response = await calculateTceaForPortfolio(portfolioId);
-            tcea(response.data.tcea);
-            netDiscountedAmount(response.data.netDiscountedAmount);
-            setIsTceaModalOpen(true);
-        } catch (error) {
-            console.error('Error calculating TCEA:', error);
         }
     };
 
@@ -82,15 +71,17 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
             const invoices = response.data;
 
             const doc = new JsPDF();
-            doc.text('Invoices', 10, 10);
+            doc.text('Letras/facturas', 10, 10);
 
             invoices.forEach((invoice, index) => {
+                const invoiceType = invoice.type === 'Invoice' ? 'Factura' : 'Letra';
                 const currencySymbol = bankCurrency === 'USD' ? '$' : 'S/.';
                 const invoiceData = [
                     index + 1,
                     invoice.amount,
                     invoice.dateTcea,
                     invoice.rucDni,
+                    invoiceType,
                     invoice.tcea.toFixed(3),
                     currencySymbol,
                     invoice.netDiscountedAmount.toFixed(3)
@@ -110,8 +101,8 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
             const totalNetDiscountedAmount = netDiscountedAmount !== null && netDiscountedAmount !== undefined ? (bankCurrency === 'USD' ? `$${netDiscountedAmount.toFixed(3)}` : `S/.${netDiscountedAmount.toFixed(3)}`) : 'N/A';
             const totalTcea = tcea !== null && tcea !== undefined ? tcea.toFixed(3) : 'N/A';
 
-            doc.text(`Total Net Discounted Amount: ${totalNetDiscountedAmount}`, 10, doc.autoTable.previous.finalY + 10);
-            doc.text(`Total TCEA: ${totalTcea}%`, 10, doc.autoTable.previous.finalY + 20);
+            doc.text(`Cantidad neta descontada: ${totalNetDiscountedAmount}`, 10, doc.autoTable.previous.finalY + 10);
+            doc.text(`TCEA General: ${totalTcea}%`, 10, doc.autoTable.previous.finalY + 20);
             doc.save('invoices.pdf');
         } catch (error) {
             console.error('Error downloading PDF:', error);
@@ -127,7 +118,7 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
             </div>
             {isOpen && (
                 <div style={styles.walletContent}>
-                    <button onClick={() => openTceaModal(portfolioId)}>Calcular TCEA</button>
+                    <button onClick={() => openTceaModal(portfolioId)}>Simulador de TCEA</button>
                     <button onClick={openInvoicesModal}>Ver letras/facturas</button>
                     <button onClick={handleDownloadPDF}>Descargar PDF</button>
                     <button onClick={handleDeletePortfolio}>Borrar Portafolio</button>

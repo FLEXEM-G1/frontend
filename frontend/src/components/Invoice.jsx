@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getPortfolioById } from '../services/portfolioService';
-import Portfolio from "./Portfolio.jsx";
 
 const Invoice = ({ record }) => {
-    const [portfolio, setPortfolio] = useState(null);
+    const [setPortfolio] = useState(null);
 
     useEffect(() => {
         const fetchPortfolio = async () => {
@@ -15,7 +14,7 @@ const Invoice = ({ record }) => {
             }
         };
         fetchPortfolio().then(r => r).catch(e => e);
-    }, [record]);
+    }, [record, setPortfolio]);
 
     const getBackgroundColor = (status) => {
         switch (status) {
