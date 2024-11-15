@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
-import logo from '../assets/logo.png'; // Ensure the path to your image file is correct
+import logo from '../../assets/logo.png'; // Ensure the path to your image file is correct
 import './Navbar.css';
 
 const Navbar = ({ isAuthenticated, onLogout }) => {

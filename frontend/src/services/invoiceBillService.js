@@ -1,14 +1,7 @@
-// services/invoiceBillService.js
 import http from './http-common.js';
 
 export const getAllInvoiceBills = async () => {
-    try {
-        const response = await http.get('/invoiceBills');
-        return response;
-    } catch (error) {
-        console.error('Error fetching invoice bills:', error);
-        throw error;
-    }
+    return await http.get('/invoiceBills');
 };
 
 export const getInvoiceBillById = async (id) => {
@@ -16,12 +9,7 @@ export const getInvoiceBillById = async (id) => {
 };
 
 export const getInvoiceBillsByPortfolioId = async (portfolioId) => {
-    try {
-        return await http.get(`/portfolio/${portfolioId}/invoiceBills`);
-    } catch (error) {
-        console.error('Error fetching invoices by portfolio ID:', error);
-        throw error;
-    }
+    return await http.get(`/portfolio/${portfolioId}/invoiceBills`);
 };
 
 export const createInvoiceBill = async (invoiceBill) => {

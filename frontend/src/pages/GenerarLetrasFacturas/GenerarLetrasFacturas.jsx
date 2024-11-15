@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { createInvoiceBill } from '../services/invoiceBillService';
-import { getAllPortfolios } from '../services/portfolioService';
-import Modal from '../components/Modal';
-import Sidebar from "../components/Sidebar.jsx";
+import { createInvoiceBill } from '../../services/invoiceBillService.js';
+import { getAllPortfolios } from '../../services/portfolioService.js';
+import Modal from '../../components/Modal/Modal.jsx';
+import Sidebar from "../../components/Sidebar/Sidebar.jsx";
 import { Dropdown } from 'primereact/dropdown';
 import './GenerarLetrasFacturas.css';
 
@@ -43,20 +43,15 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
         const selectedPortfolio = portfolios.find(portfolio => portfolio._id === e.value._id);
         setNewInvoiceBill({
             ...newInvoiceBill,
-            portfolioId: selectedPortfolio._id,
-            currency: selectedPortfolio.currency,
-            rucDni: selectedPortfolio.rucDni,
-            razSocNam: selectedPortfolio.razSocNam
+            portfolioId: selectedPortfolio ? selectedPortfolio._id : '',
+            currency: selectedPortfolio ? selectedPortfolio.currency : '',
+            rucDni: selectedPortfolio ? selectedPortfolio.rucDni : '',
+            razSocNam: selectedPortfolio ? selectedPortfolio.razSocNam : ''
         });
     };
 
     const handleTypeChange = (e) => {
-        if (e.value) {
-            setNewInvoiceBill({ ...newInvoiceBill, type: e.value.code });
-        }
-        else {
-            setNewInvoiceBill({ ...newInvoiceBill, type: '' });
-        }
+        setNewInvoiceBill({ ...newInvoiceBill, type: e.value ? e.value.code : '' });
     };
 
     const handleCreateInvoiceBill = async (e) => {
@@ -94,7 +89,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             <label htmlFor="portfolioId">Portafolio</label>
                             <Dropdown
                                 id="portfolioId"
-                                value={portfolios.find(portfolio => portfolio._id === newInvoiceBill.portfolioId)}
+                                value={portfolios.find(portfolio => portfolio._id === newInvoiceBill.portfolioId) || null}
                                 onChange={handlePortfolioChange}
                                 options={portfolios}
                                 optionLabel="name"
@@ -106,9 +101,9 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                         <div className="form-group">
                             <label htmlFor="invoiceBillNumber">Número de letra/factura</label>
                             <input
-                                type="text"
+                                type="number"
                                 name="invoiceBillNumber"
-                                value={newInvoiceBill.invoiceBillNumber}
+                                value={newInvoiceBill.invoiceBillNumber || ''}
                                 onChange={handleChange}
                                 placeholder="Invoice Bill Number"
                                 required
@@ -118,7 +113,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             <label htmlFor="type">Tipo</label>
                             <Dropdown
                                 id="type"
-                                value={invoiceTypes.find(type => type.code === newInvoiceBill.type)}
+                                value={invoiceTypes.find(type => type.code === newInvoiceBill.type) || null}
                                 onChange={handleTypeChange}
                                 options={invoiceTypes}
                                 optionLabel="name"
@@ -133,7 +128,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             <input
                                 type="text"
                                 name="rucDni"
-                                value={newInvoiceBill.rucDni}
+                                value={newInvoiceBill.rucDni || ''}
                                 onChange={handleChange}
                                 placeholder="RUC/DNI"
                                 required
@@ -144,7 +139,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             <input
                                 type="text"
                                 name="razSocNam"
-                                value={newInvoiceBill.razSocNam}
+                                value={newInvoiceBill.razSocNam || ''}
                                 onChange={handleChange}
                                 placeholder="Razón Social/Nombres"
                                 required
@@ -155,7 +150,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             <input
                                 type="number"
                                 name="amount"
-                                value={newInvoiceBill.amount}
+                                value={newInvoiceBill.amount || ''}
                                 onChange={handleChange}
                                 placeholder="Amount"
                                 min="1"
@@ -167,7 +162,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             <input
                                 type="text"
                                 name="currency"
-                                value={newInvoiceBill.currency}
+                                value={newInvoiceBill.currency || ''}
                                 onChange={handleChange}
                                 placeholder="Currency"
                                 readOnly
@@ -179,7 +174,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             <input
                                 type="date"
                                 name="issueDate"
-                                value={newInvoiceBill.issueDate}
+                                value={newInvoiceBill.issueDate || ''}
                                 onChange={handleChange}
                                 placeholder="Issue Date"
                                 required
@@ -190,7 +185,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                             <input
                                 type="date"
                                 name="expirationDate"
-                                value={newInvoiceBill.expirationDate}
+                                value={newInvoiceBill.expirationDate || ''}
                                 onChange={handleChange}
                                 placeholder="Expiration Date"
                                 required

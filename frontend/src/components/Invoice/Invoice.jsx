@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getPortfolioById } from '../services/portfolioService';
+import { getPortfolioById } from '../../services/portfolioService.js';
+
 
 const Invoice = ({ record }) => {
-    const [setPortfolio] = useState(null);
+    const [portfolio, setPortfolio] = useState(null);
 
     useEffect(() => {
         const fetchPortfolio = async () => {

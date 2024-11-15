@@ -14,6 +14,7 @@ const Sidebar = () => {
             <Link to="/mis-registros">Mis Registros</Link>
             <Link to="/generar-letras-facturas">Generar Letras/Facturas</Link>
             <Link to="/ver-cartera">Ver Cartera</Link>
+            <Link to="/faq">FAQ</Link>
         </div>
     );
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import InvoiceList from '../components/InvoiceList';
-import {getAllInvoiceBills} from '../services/invoiceBillService';
-import Sidebar from '../components/Sidebar';
+import InvoiceList from '../../components/InvoiceList.jsx';
+import {getAllInvoiceBills} from '../../services/invoiceBillService.js';
+import Sidebar from '../../components/Sidebar/Sidebar.jsx';
 import './MisRegistros.css';
 
 const MisRegistros = () => {

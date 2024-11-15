@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import Invoice from './Invoice';
-import Modal from './Modal';
+import Invoice from './Invoice/Invoice.jsx';
+import Modal from './Modal/Modal.jsx';
 
 const InvoiceList = ({ invoices }) => {
     const [filter, setFilter] = useState('Todos');

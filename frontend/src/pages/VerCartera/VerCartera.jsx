@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { createPortfolio, getAllPortfolios, calculateTceaForPortfolio } from '../services/portfolioService';
-import { getAllBanks } from '../services/bankService';
+import { createPortfolio, getAllPortfolios, calculateTceaForPortfolio } from '../../services/portfolioService.js';
+import { getAllBanks } from '../../services/bankService.js';
 import {ToastContainer, toast} from "react-toastify";
-import Portfolio from '../components/Portfolio.jsx';
-import Modal from '../components/Modal';
-import Sidebar from '../components/Sidebar';
+import Portfolio from '../../components/Portfolio/Portfolio.jsx';
+import Modal from '../../components/Modal/Modal.jsx';
+import Sidebar from '../../components/Sidebar/Sidebar.jsx';
 import { Dropdown } from 'primereact/dropdown';
 import './VerCartera.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -23,6 +23,7 @@ const VerCartera = () => {
         { name: 'USD', code: 'USD' },
         { name: 'PEN', code: 'PEN' },
     ];
+
 
     useEffect(() => {
         const fetchPortfolios = async () => {
@@ -62,13 +63,8 @@ const VerCartera = () => {
             toast.success(`TCEA: ${response.tcea}, Monto Neto Descontado: ${response.netDiscountedAmount}`);
         } catch (error) {
             console.error('Error calculating TCEA:', error);
-            toast.error('Error calculating TCEA');
+            toast.error('No se pudo calcular el TCEA. No se encontraron facturas o letras asociadas al portafolio');
         }
-    };
-
-    const handleDeletePortfolio = (portfolioId) => {
-        setPortfolios(portfolios.filter(portfolio => portfolio._id !== portfolioId));
-
     };
 
     const openTceaModal = (portfolioId) => {
@@ -149,15 +145,18 @@ const VerCartera = () => {
                         portfolios.map((portfolio) => (
                             portfolio && portfolio._id ? (
                                 <div key={portfolio._id}>
-                                    <Portfolio
-                                        bankName={portfolio.name}
-                                        bankCurrency={portfolio.currency}
-                                        portfolioId={portfolio._id}
-                                        openTceaModal={openTceaModal}
-                                        onDelete={handleDeletePortfolio}
-                                        tcea={tceaResults[portfolio._id]}
-                                        netDiscountedAmount={netDiscountedAmount[portfolio._id]}
-                                    />
+                                    <div key={portfolio._id}>
+                                        <Portfolio
+                                            bankName={portfolio.name}
+                                            bankCurrency={portfolio.currency}
+                                            portfolioId={portfolio._id}
+                                            openTceaModal={openTceaModal}
+                                            onDelete={(deletedPortfolioId) => setPortfolios(portfolios.filter(p => p._id !== deletedPortfolioId))}
+                                            tcea={tceaResults[portfolio._id]}
+                                            netDiscountedAmount={netDiscountedAmount[portfolio._id]}
+                                        />
+                                    </div>
+
                                 </div>
                             ) : (
                                 <p key={portfolio._id || Math.random()}>Información inválida del portafolio</p>
@@ -168,7 +167,7 @@ const VerCartera = () => {
                     )}
                 </div>
             </div>
-            <ToastContainer />
+            <ToastContainer/>
         </div>
     );
 };

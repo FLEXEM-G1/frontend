@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import Sidebar from './Sidebar';
-import MisRegistros from '../pages/MisRegistros';
-import GenerarLetrasFacturas from '../pages/GenerarLetrasFacturas';
-import VerCartera from '../pages/VerCartera';
-import PieChart from './PieChart';
+import Sidebar from '../Sidebar/Sidebar.jsx';
+import MisRegistros from '../../pages/MisRegistros/MisRegistros.jsx';
+import GenerarLetrasFacturas from '../../pages/GenerarLetrasFacturas/GenerarLetrasFacturas.jsx';
+import VerCartera from '../../pages/VerCartera/VerCartera.jsx';
+import PieChart from '../PieChart.jsx';
 import './Menu.css';
-import VerPerfil from "../pages/VerPerfil";
+import VerPerfil from "../../pages/VerPerfil/VerPerfil.jsx";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { getAllInvoiceBills } from '../services/invoiceBillService';
+import { getAllInvoiceBills } from '../../services/invoiceBillService.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

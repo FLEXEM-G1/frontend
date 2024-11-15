@@ -1,15 +1,16 @@
 // frontend/src/App.js
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar.jsx';
-import Menu from './components/Menu.jsx';
-import Register from './pages/Register.jsx';
-import Login from './pages/Login.jsx';
-import Home from './pages/Home.jsx';
-import VerCartera from './pages/VerCartera.jsx';
-import GenerarLetrasFacturas from './pages/GenerarLetrasFacturas.jsx';
-import MisRegistros from './pages/MisRegistros.jsx';
+import Navbar from './components/Navbar/Navbar.jsx';
+import Menu from './components/Menu/Menu.jsx';
+import Register from './pages/Register/Register.jsx';
+import Login from './pages/Login/Login.jsx';
+import Home from './pages/Home/Home.jsx';
+import VerCartera from './pages/VerCartera/VerCartera.jsx';
+import GenerarLetrasFacturas from './pages/GenerarLetrasFacturas/GenerarLetrasFacturas.jsx';
+import MisRegistros from './pages/MisRegistros/MisRegistros.jsx';
 import './App.css';
+import FAQ from "./pages/FAQ/FAQ.jsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -40,6 +41,7 @@ function App() {
             <Route path="/mis-registros" element={<MisRegistros invoices={invoices} />} />
             <Route path="/*" element={isAuthenticated ? <Menu /> : <Navigate to="/login" />} />
             <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/faq" element={<FAQ />} />
           </Routes>
         </div>
       </Router>

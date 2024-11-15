@@ -1,4 +1,3 @@
-// frontend/src/services/portfolioService.js
 import http from './http-common.js';
 
 export const getAllPortfolios = async () => {
@@ -41,11 +40,5 @@ export const calculateTceaForPortfolio = async (id, data) => {
 };
 
 export const deletePortfolio = async (id) => {
-    try {
-        const response = await http.delete(`/portfolios/${id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error deleting portfolio:', error);
-        throw error;
-    }
+    return await http.delete(`/portfolios/${id}`);
 };

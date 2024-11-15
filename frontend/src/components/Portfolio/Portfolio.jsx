@@ -1,9 +1,9 @@
 import React, { useState, CSSProperties } from 'react';
-import {deletePortfolio } from '../services/portfolioService';
-import Invoice from './Invoice';
-import Modal from './Modal';
-import { deleteInvoiceBill, getInvoiceBillsByPortfolioId } from '../services/invoiceBillService.js';
-import {toast} from "react-toastify";
+import { deletePortfolio } from '../../services/portfolioService.js';
+import Invoice from '../Invoice/Invoice.jsx';
+import Modal from '../Modal/Modal.jsx';
+import { deleteInvoiceBill, getInvoiceBillsByPortfolioId } from '../../services/invoiceBillService.js';
+import { toast } from "react-toastify";
 import JsPDF from 'jspdf';
 import 'jspdf-autotable';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,6 +12,7 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
     const [isOpen, setIsOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
+    const [isDeleted, setIsDeleted] = useState(false); // Nuevo estado para controlar la eliminación
     const [invoices, setInvoices] = useState([]);
     const [isTceaModalOpen, setIsTceaModalOpen] = useState(false);
     const tableColumn = ["Factura", "Cantidad", "Fecha de vencimiento", "RUC/DNI", "Tipo", "TCEA", "Moneda", "Monto descontado"];
@@ -27,43 +28,44 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
             setInvoices(response.data);
             setIsModalOpen(true);
         } catch (error) {
-            console.error('Error fetching invoices:', error);
+            toast.error('No existen letras o facturas asignadas al portafolio');
         }
     };
 
     const handleDeletePortfolio = async () => {
         try {
             const response = await getInvoiceBillsByPortfolioId(portfolioId);
-            if (response.data.length > 0) {
-                setInvoices(response.data);
+            setInvoices(response.data);
+            setIsWarningModalOpen(true);
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                // No invoices found, proceed with deletion
+                setInvoices([]);
                 setIsWarningModalOpen(true);
             } else {
-                await deletePortfolio(portfolioId);
-                onDelete(portfolioId);
-                window.location.reload();
+                console.error('Error fetching invoices:', error);
+                toast.error('Error al obtener las facturas del portafolio');
             }
-        } catch (error) {
-            console.error('Error deleting portfolio:', error);
         }
     };
 
     const confirmDeletePortfolio = async () => {
-        for (const invoice of invoices) {
-            try {
-                await deleteInvoiceBill(invoice._id);
-            } catch (error) {
-                console.error('Error deleting invoice:', error);
-            }
-        }
         try {
+            if (invoices.length > 0) {
+                await Promise.all(invoices.map(invoice => deleteInvoiceBill(invoice._id)));
+            }
             await deletePortfolio(portfolioId);
+            setIsDeleted(true);
             onDelete(portfolioId);
-            toast.success('El portafolio ha sido eliminado');
+            setIsWarningModalOpen(false);
+            toast.success('El portafolio y sus facturas han sido eliminados');
         } catch (error) {
             console.error('Error deleting portfolio:', error);
-            toast.error('Error al eliminar el portafolio');
+            toast.error('Error al eliminar el portafolio y sus facturas');
         }
     };
+
+
 
     const handleDownloadPDF = async () => {
         try {
@@ -105,7 +107,7 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
             doc.text(`TCEA General: ${totalTcea}%`, 10, doc.autoTable.previous.finalY + 20);
             doc.save('invoices.pdf');
         } catch (error) {
-            console.error('Error downloading PDF:', error);
+            toast.error('No se pudieron descargar las facturas');
         }
     };
 
@@ -132,16 +134,27 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
                             <Invoice key={invoice._id} record={invoice} />
                         ))
                     ) : (
-                        <p>No letras/facturas disponibles</p>
+                        <p>No hay letras o facturas creadas asignadas al portafolio</p>
                     )}
                 </div>
             </Modal>
             <Modal isOpen={isWarningModalOpen} onClose={() => setIsWarningModalOpen(false)}>
                 <div style={styles.warningContent}>
-                    <h2>Advertencia</h2>
-                    <p>Este portafolio tiene facturas asociadas. Al eliminar el portafolio, también se eliminarán las facturas. ¿Desea continuar?</p>
-                    <button onClick={confirmDeletePortfolio}>Aceptar</button>
-                    <button onClick={() => setIsWarningModalOpen(false)}>Cancelar</button>
+                    {invoices.length > 0 ? (
+                        <>
+                            <h2>Advertencia</h2>
+                            <p>Este portafolio tiene facturas asociadas. Al eliminar el portafolio, también se eliminarán las facturas. ¿Desea continuar?</p>
+                            <button onClick={confirmDeletePortfolio}>Aceptar</button>
+                            <button onClick={() => setIsWarningModalOpen(false)}>Cancelar</button>
+                        </>
+                    ) : (
+                        <>
+                            <h2>Advertencia</h2>
+                            <p>¿Está seguro que desea eliminar el portafolio?</p>
+                            <button onClick={confirmDeletePortfolio}>Aceptar</button>
+                            <button onClick={() => setIsWarningModalOpen(false)}>Cancelar</button>
+                        </>
+                    )}
                 </div>
             </Modal>
             <Modal isOpen={isTceaModalOpen} onClose={() => setIsTceaModalOpen(false)}>
@@ -161,6 +174,7 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
         </div>
     );
 };
+
 
 const styles: { [key: string]: CSSProperties } = {
     walletContainer: {

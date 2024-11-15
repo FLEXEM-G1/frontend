@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Login.css';
-import logo from '../assets/black-and-white-logo.png';
+import logo from '../../assets/black-and-white-logo.png';
 import { useNavigate } from 'react-router-dom';
 
 const Login = ({ onLogin }) => {
