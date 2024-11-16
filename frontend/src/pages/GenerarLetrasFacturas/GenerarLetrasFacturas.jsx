@@ -4,7 +4,10 @@ import { getAllPortfolios } from '../../services/portfolioService.js';
 import Modal from '../../components/Modal/Modal.jsx';
 import Sidebar from "../../components/Sidebar/Sidebar.jsx";
 import { Dropdown } from 'primereact/dropdown';
+import {toast} from "react-toastify";
 import './GenerarLetrasFacturas.css';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const GenerarLetrasFacturas = ({ addInvoice }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,6 +62,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
         try {
             const response = await createInvoiceBill(newInvoiceBill);
             addInvoice(response.data); // Add the new invoice to the global state
+            const portfolioName = portfolios.find(portfolio => portfolio._id === newInvoiceBill.portfolioId)?.name || 'Portfolio';
             setNewInvoiceBill({
                 portfolioId: '',
                 invoiceBillNumber: '',
@@ -72,6 +76,7 @@ const GenerarLetrasFacturas = ({ addInvoice }) => {
                 state: 'Not Capitalized',
             });
             setIsModalOpen(false);
+            toast.success(`Letra/factura creada exitosamente en el portafolio ${portfolioName}`);
         } catch (error) {
             console.error('Error creating invoice bill:', error);
         }

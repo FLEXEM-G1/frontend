@@ -22,6 +22,11 @@ const Register = () => {
         }
         try {
             await signUp({ email, password, name, phone, address });
+            localStorage.setItem('name', name);
+            localStorage.setItem('email', email);
+            localStorage.setItem('phone', phone);
+            localStorage.setItem('address', address);
+            console.log('Usuario creado:', { name, email, phone, address });
             navigate('/login');
         } catch (error) {
             console.error('Error during registration:', error);
@@ -32,7 +37,7 @@ const Register = () => {
         <div className="register-container">
             <div className="register-form">
                 <h2>REGISTRAR USUARIO</h2>
-                <form onSubmit={handleSubmit}>
+                <form>
                     <div className="form-group">
                         <label htmlFor="user">Usuario:</label>
                         <input
@@ -113,7 +118,7 @@ const Register = () => {
                 </form>
             </div>
             <div className="register-actions-container">
-                <RegisterActions />
+                <RegisterActions handleSubmit={handleSubmit} />
             </div>
         </div>
     );

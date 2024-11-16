@@ -40,5 +40,11 @@ export const calculateTceaForPortfolio = async (id, data) => {
 };
 
 export const deletePortfolio = async (id) => {
-    return await http.delete(`/portfolios/${id}`);
+    try {
+        const response = await http.delete(`/portfolios/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error eliminando el portafolio:", error.response?.data || error.message);
+        throw error;
+    }
 };

@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { createPortfolio, getAllPortfolios, calculateTceaForPortfolio } from '../../services/portfolioService.js';
-import { getAllBanks } from '../../services/bankService.js';
-import {ToastContainer, toast} from "react-toastify";
-import Portfolio from '../../components/Portfolio/Portfolio.jsx';
+import {
+    getAllPortfolios,
+    deletePortfolio,
+    createPortfolio,
+    calculateTceaForPortfolio,
+} from '../../services/portfolioService.js';
+import { ToastContainer, toast } from "react-toastify";
+import PortfolioList from '../../components/Portfolio/PortfolioList.jsx';
 import Modal from '../../components/Modal/Modal.jsx';
 import Sidebar from '../../components/Sidebar/Sidebar.jsx';
 import { Dropdown } from 'primereact/dropdown';
 import './VerCartera.css';
 import 'react-toastify/dist/ReactToastify.css';
+import { getAllBanks } from '../../services/bankService.js';
+import { deleteInvoicesByPortfolioId } from '../../services/invoiceBillService.js';
 
 const VerCartera = () => {
     const [portfolios, setPortfolios] = useState([]);
@@ -19,24 +25,35 @@ const VerCartera = () => {
     const [banks, setBanks] = useState([]);
     const [tceaResults, setTceaResults] = useState({});
     const [netDiscountedAmount, setNetDiscountedAmount] = useState({});
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
+    const [portfolioToDelete, setPortfolioToDelete] = useState(null);
     const currencies = [
         { name: 'USD', code: 'USD' },
         { name: 'PEN', code: 'PEN' },
     ];
 
-
     useEffect(() => {
         const fetchPortfolios = async () => {
-            const response = await getAllPortfolios();
-            setPortfolios(response.data);
+            try {
+                const response = await getAllPortfolios();
+                setPortfolios(response.data);
+            } catch (error) {
+                console.error('Error fetching portfolios:', error);
+            }
         };
-        fetchPortfolios().then(r => r).catch(e => e);
 
         const fetchBanks = async () => {
-            const response = await getAllBanks();
-            setBanks(response);
+            try {
+                const response = await getAllBanks();
+                setBanks(response);
+            } catch (error) {
+                console.error('Error fetching banks:', error);
+            }
         };
-        fetchBanks().then(r => r).catch(e => e);
+
+        fetchPortfolios();
+        fetchBanks();
     }, []);
 
     const handleCurrencyChange = (e) => {
@@ -71,6 +88,35 @@ const VerCartera = () => {
         const portfolio = portfolios.find(p => p._id === portfolioId);
         setSelectedPortfolio(portfolio);
         setIsTceaModalOpen(true);
+    };
+
+    const handleDeletePortfolio = async (deletedPortfolioId) => {
+        setIsDeleting(true);
+        try {
+            // Eliminar las facturas relacionadas con el portafolio
+            await deleteInvoicesByPortfolioId(deletedPortfolioId);
+            toast.info('Facturas eliminadas. Ahora se eliminará el portafolio.');
+
+            // Eliminar el portafolio
+            const response = await deletePortfolio(deletedPortfolioId);
+            setPortfolios((prev) => prev.filter((portfolio) => portfolio._id !== deletedPortfolioId));
+            toast.success(response.message || "Portafolio eliminado exitosamente.");
+        } catch (error) {
+            console.error("Error eliminando el portafolio:", error);
+            toast.error(error.response?.data?.message || "No se pudo eliminar el portafolio.");
+        } finally {
+            setIsDeleting(false);
+            setIsWarningModalOpen(false);
+        }
+    };
+
+    const openWarningModal = (portfolioId) => {
+        setPortfolioToDelete(portfolioId);
+        setIsWarningModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        handleDeletePortfolio(portfolioToDelete);
     };
 
     return (
@@ -117,7 +163,7 @@ const VerCartera = () => {
                             <label htmlFor="bankId">Banco</label>
                             <Dropdown
                                 id="bankId"
-                                value={banks.find(bank => bank._id === tceaDetails.bankId)}
+                                value={banks.length > 0 ? banks.find(bank => bank._id === tceaDetails.bankId) : null}
                                 onChange={(e) => setTceaDetails({...tceaDetails, bankId: e.value._id})}
                                 options={banks}
                                 optionLabel="name"
@@ -140,32 +186,23 @@ const VerCartera = () => {
                         <button onClick={handleCalculateTcea}>Calcular TCEA</button>
                     </div>
                 </Modal>
-                <div className="wallets-container">
-                    {portfolios && portfolios.length > 0 ? (
-                        portfolios.map((portfolio) => (
-                            portfolio && portfolio._id ? (
-                                <div key={portfolio._id}>
-                                    <div key={portfolio._id}>
-                                        <Portfolio
-                                            bankName={portfolio.name}
-                                            bankCurrency={portfolio.currency}
-                                            portfolioId={portfolio._id}
-                                            openTceaModal={openTceaModal}
-                                            onDelete={(deletedPortfolioId) => setPortfolios(portfolios.filter(p => p._id !== deletedPortfolioId))}
-                                            tcea={tceaResults[portfolio._id]}
-                                            netDiscountedAmount={netDiscountedAmount[portfolio._id]}
-                                        />
-                                    </div>
-
-                                </div>
-                            ) : (
-                                <p key={portfolio._id || Math.random()}>Información inválida del portafolio</p>
-                            )
-                        ))
-                    ) : (
-                        <p>No hay portafolios disponibles</p>
-                    )}
-                </div>
+                <Modal isOpen={isWarningModalOpen} onClose={() => setIsWarningModalOpen(false)}>
+                    <div>
+                        <h2>Advertencia</h2>
+                        <p>¿Estás seguro de que deseas eliminar este portafolio? Esta acción no se puede deshacer.</p>
+                        <button onClick={confirmDelete} disabled={isDeleting}>
+                            {isDeleting ? 'Eliminando...' : 'Confirmar'}
+                        </button>
+                        <button onClick={() => setIsWarningModalOpen(false)}>Cancelar</button>
+                    </div>
+                </Modal>
+                <PortfolioList
+                    portfolios={portfolios}
+                    openTceaModal={openTceaModal}
+                    onDelete={openWarningModal}
+                    tceaResults={tceaResults}
+                    netDiscountedAmount={netDiscountedAmount}
+                />
             </div>
             <ToastContainer/>
         </div>
@@ -173,4 +210,3 @@ const VerCartera = () => {
 };
 
 export default VerCartera;
-

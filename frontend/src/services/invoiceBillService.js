@@ -21,6 +21,22 @@ export const updateInvoiceBill = async (id, invoiceBill) => {
 };
 
 export const deleteInvoiceBill = async (id) => {
-    return await http.delete(`/invoiceBills/${id}`);
+    try {
+        const response = await http.delete(`invoiceBills/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting invoices:', error);
+        throw error;
+    }
 };
+
+export const deleteInvoicesByPortfolioId = async (portfolioId) => {
+    try {
+        const response = await http.delete(`/portfolio/${portfolioId}/invoiceBills`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting invoices:', error);
+        throw error;
+    }
+}
 

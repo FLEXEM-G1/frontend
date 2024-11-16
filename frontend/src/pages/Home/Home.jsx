@@ -6,8 +6,6 @@ const Home = () => {
     return (
         <div className="home">
             <h1>Bienvenido a FLEXEM </h1>
-            <p>Flexem es una aplicación de gestión de tareas que te permite organizar tu tiempo de forma eficiente.</p>
-            <p>Por favor, elige una de las siguientes opciones para continuar:</p>
             <div className="button-container">
                 <Link to="/register">
                     <button className="home-button">Crear una Cuenta Nueva</button>
