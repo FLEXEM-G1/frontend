@@ -26,6 +26,10 @@ const Menu = () => {
     const [totalInvoices, setTotalInvoices] = useState(0);
     const [notCapitalizedInvoices, setNotCapitalizedInvoices] = useState(0);
     const [tceaAverage, setTceaAverage] = useState(0);
+    const [netGeneralAmount, setNetGeneralAmount] = useState(0);
+    const [currency, setCurrency] = useState('USD');
+
+    const exchangeRate = 3.5;
 
     useEffect(() => {
         const fetchInvoices = async () => {
@@ -33,15 +37,19 @@ const Menu = () => {
                 const response = await getAllInvoiceBills();
                 const invoices = response.data;
                 const statusCounts = { 'Not Capitalized': 0, 'Capitalized': 0 };
+                let totalNetAmount = 0;
+                let totalAmount = 0;
 
                 invoices.forEach(invoice => {
                     if (statusCounts[invoice.state] !== undefined) {
                         statusCounts[invoice.state]++;
                     }
+                    totalNetAmount += invoice.netAmount;
+                    totalAmount += invoice.amount;
                 });
 
                 setPieChartData({
-                    labels: ['Not Capitalized', 'Capitalized'],
+                    labels: ['No capitalizados', 'Capitalizados'],
                     datasets: [
                         {
                             label: '# of Invoices',
@@ -54,6 +62,7 @@ const Menu = () => {
                 setTotalInvoices(invoices.length);
                 setNotCapitalizedInvoices(statusCounts['Not Capitalized']);
                 setTceaAverage(invoices.reduce((acc, invoice) => acc + invoice.tcea, 0) / invoices.length);
+                setNetGeneralAmount(totalAmount); // Update the netGeneralAmount with the total amount
 
             } catch (error) {
                 console.error('Error fetching invoices:', error);
@@ -64,6 +73,12 @@ const Menu = () => {
     }, []);
 
     const location = useLocation();
+
+    const toggleCurrency = () => {
+        setCurrency(prevCurrency => (prevCurrency === 'USD' ? 'PEN' : 'USD'));
+    };
+
+    const convertedAmount = currency === 'USD' ? netGeneralAmount : netGeneralAmount * exchangeRate;
 
     return (
         <div className="menu">
@@ -82,6 +97,12 @@ const Menu = () => {
                             <div className="rectangleText">Total Letras/Facturas: {totalInvoices}</div>
                             <div className="rectangleText">No Capitalizadas: {notCapitalizedInvoices}</div>
                             <div className="rectangleText">TCEA Promedio: {tceaAverage.toFixed(3)}</div>
+                            <div className="rectangleText">
+                                Monto Neto General: {convertedAmount.toFixed(2)} {currency}
+                                <button onClick={toggleCurrency} style={{ marginLeft: '10px' }}>
+                                    Ver en {currency === 'USD' ? 'Soles' : 'Dólares'}
+                                </button>
+                            </div>
                         </div>
                         <div className="chart-container">
                             <PieChart data={pieChartData} />

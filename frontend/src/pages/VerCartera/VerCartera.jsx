@@ -28,6 +28,7 @@ const VerCartera = () => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
     const [portfolioToDelete, setPortfolioToDelete] = useState(null);
+    const [openPortfolioId, setOpenPortfolioId] = useState(null); // State to track the open portfolio
     const currencies = [
         { name: 'USD', code: 'USD' },
         { name: 'PEN', code: 'PEN' },
@@ -93,11 +94,14 @@ const VerCartera = () => {
     const handleDeletePortfolio = async (deletedPortfolioId) => {
         setIsDeleting(true);
         try {
-            // Eliminar las facturas relacionadas con el portafolio
-            await deleteInvoicesByPortfolioId(deletedPortfolioId);
-            toast.info('Facturas eliminadas. Ahora se eliminará el portafolio.');
+            // Attempt to delete the invoices related to the portfolio
+            try {
+                await deleteInvoicesByPortfolioId(deletedPortfolioId);
+            } catch (error) {
+                console.warn('No invoices found for this portfolio or error deleting invoices:', error);
+            }
 
-            // Eliminar el portafolio
+            // Delete the portfolio
             const response = await deletePortfolio(deletedPortfolioId);
             setPortfolios((prev) => prev.filter((portfolio) => portfolio._id !== deletedPortfolioId));
             toast.success(response.message || "Portafolio eliminado exitosamente.");
@@ -117,6 +121,10 @@ const VerCartera = () => {
 
     const confirmDelete = () => {
         handleDeletePortfolio(portfolioToDelete);
+    };
+
+    const togglePortfolio = (portfolioId) => {
+        setOpenPortfolioId(openPortfolioId === portfolioId ? null : portfolioId);
     };
 
     return (
@@ -202,6 +210,8 @@ const VerCartera = () => {
                     onDelete={openWarningModal}
                     tceaResults={tceaResults}
                     netDiscountedAmount={netDiscountedAmount}
+                    openPortfolioId={openPortfolioId}
+                    togglePortfolio={togglePortfolio}
                 />
             </div>
             <ToastContainer/>

@@ -1,9 +1,8 @@
-// frontend/src/components/Portfolio/PortfolioList.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import Portfolio from './Portfolio.jsx';
 
-const PortfolioList = ({ portfolios, onDelete, openTceaModal, tceaResults, netDiscountedAmount }) => {
+const PortfolioList = ({ portfolios, onDelete, openTceaModal, tceaResults, netDiscountedAmount, openPortfolioId, togglePortfolio }) => {
     if (!portfolios || portfolios.length === 0) {
         return <p>No hay portafolios disponibles</p>;
     }
@@ -22,6 +21,8 @@ const PortfolioList = ({ portfolios, onDelete, openTceaModal, tceaResults, netDi
                         openTceaModal={openTceaModal}
                         onDelete={onDelete}
                         openWarningModal={onDelete}
+                        isOpen={openPortfolioId === portfolio._id}
+                        toggleDetails={() => togglePortfolio(portfolio._id)}
                     />
                 ) : (
                     <p key={Math.random()}>Información inválida del portafolio</p>
@@ -36,7 +37,9 @@ PortfolioList.propTypes = {
     onDelete: PropTypes.func.isRequired,
     openTceaModal: PropTypes.func.isRequired,
     tceaResults: PropTypes.object.isRequired,
-    netDiscountedAmount: PropTypes.object.isRequired
+    netDiscountedAmount: PropTypes.object.isRequired,
+    openPortfolioId: PropTypes.string,
+    togglePortfolio: PropTypes.func.isRequired,
 };
 
 export default PortfolioList;

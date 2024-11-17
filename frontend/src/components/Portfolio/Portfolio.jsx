@@ -1,4 +1,3 @@
-// frontend/src/components/Portfolio/Portfolio.jsx
 import React, { useState, useEffect, CSSProperties } from 'react';
 import { getInvoiceBillsByPortfolioId, deleteInvoiceBill } from '../../services/invoiceBillService.js';
 import { toast } from "react-toastify";
@@ -8,17 +7,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import Invoice from '../Invoice/Invoice.jsx';
 import Modal from '../Modal/Modal.jsx';
 
-const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelete, tcea, netDiscountedAmount, openWarningModal }) => {
-    const [isOpen, setIsOpen] = useState(false);
+const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelete, tcea, netDiscountedAmount, openWarningModal, isOpen, toggleDetails }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [invoices, setInvoices] = useState([]);
     const [isTceaModalOpen, setIsTceaModalOpen] = useState(false);
-    const tableColumn = ["Factura", "Cantidad", "Fecha de vencimiento", "RUC/DNI", "Tipo", "TCEA", "Moneda", "Monto descontado"];
+    const tableColumn = ["Factura", "Moneda", "Monto", "Fecha de vencimiento", "RUC/DNI", "Tipo", "TCEA", "Moneda", "Monto descontado"];
     const tableRows = [];
-
-    const toggleDetails = async () => {
-        setIsOpen(!isOpen);
-    };
 
     const openInvoicesModal = async () => {
         try {
@@ -43,8 +37,9 @@ const Portfolio = ({ bankName, bankCurrency, portfolioId, openTceaModal, onDelet
                 const currencySymbol = bankCurrency === 'USD' ? '$' : 'S/.';
                 const invoiceData = [
                     index + 1,
+                    currencySymbol,
                     invoice.amount,
-                    invoice.dateTcea,
+                    invoice.dateTcea.substring(0, 10),
                     invoice.rucDni,
                     invoiceType,
                     invoice.tcea.toFixed(3),
