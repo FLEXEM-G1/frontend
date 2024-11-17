@@ -94,7 +94,6 @@ const VerCartera = () => {
     const handleDeletePortfolio = async (deletedPortfolioId) => {
         setIsDeleting(true);
         try {
-            // Attempt to delete the invoices related to the portfolio
             try {
                 await deleteInvoicesByPortfolioId(deletedPortfolioId);
             } catch (error) {
