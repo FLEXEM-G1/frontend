@@ -10,9 +10,11 @@ import PortfolioList from '../../components/Portfolio/PortfolioList.jsx';
 import Modal from '../../components/Modal/Modal.jsx';
 import Sidebar from '../../components/Sidebar/Sidebar.jsx';
 import { Dropdown } from 'primereact/dropdown';
+import 'react-tooltip/dist/react-tooltip.css'
+import { Tooltip } from 'react-tooltip';
 import './VerCartera.css';
 import 'react-toastify/dist/ReactToastify.css';
-import { getAllBanks } from '../../services/bankService.js';
+import { getAllBanks, getBankById } from '../../services/bankService.js';
 import { deleteInvoicesByPortfolioId } from '../../services/invoiceBillService.js';
 
 const VerCartera = () => {
@@ -28,7 +30,8 @@ const VerCartera = () => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
     const [portfolioToDelete, setPortfolioToDelete] = useState(null);
-    const [openPortfolioId, setOpenPortfolioId] = useState(null); // State to track the open portfolio
+    const [openPortfolioId, setOpenPortfolioId] = useState(null);
+    const [bankInfo, setBankInfo] = useState(null);
     const currencies = [
         { name: 'USD', code: 'USD' },
         { name: 'PEN', code: 'PEN' },
@@ -100,7 +103,6 @@ const VerCartera = () => {
                 console.warn('No invoices found for this portfolio or error deleting invoices:', error);
             }
 
-            // Delete the portfolio
             const response = await deletePortfolio(deletedPortfolioId);
             setPortfolios((prev) => prev.filter((portfolio) => portfolio._id !== deletedPortfolioId));
             toast.success(response.message || "Portafolio eliminado exitosamente.");
@@ -124,6 +126,16 @@ const VerCartera = () => {
 
     const togglePortfolio = (portfolioId) => {
         setOpenPortfolioId(openPortfolioId === portfolioId ? null : portfolioId);
+    };
+
+    const fetchBankInfo = async (bankId) => {
+        try {
+            const response = await getBankById(bankId);
+            setBankInfo(response.data);
+        } catch (error) {
+            console.error('Error fetching bank info:', error);
+            toast.error('No se pudo obtener la información del banco');
+        }
     };
 
     return (
@@ -171,13 +183,37 @@ const VerCartera = () => {
                             <Dropdown
                                 id="bankId"
                                 value={banks.length > 0 ? banks.find(bank => bank._id === tceaDetails.bankId) : null}
-                                onChange={(e) => setTceaDetails({...tceaDetails, bankId: e.value._id})}
+                                onChange={(e) => {
+                                    setTceaDetails({...tceaDetails, bankId: e.value._id});
+                                    fetchBankInfo(e.value._id).then(r => r);
+                                }}
                                 options={banks}
                                 optionLabel="name"
                                 placeholder="Selecciona un banco"
                                 className="w-full md:w-14rem"
                                 required
                             />
+                            <div className="info-icon" data-tooltip-id="bankInfoTooltip" style={{cursor: 'pointer'}}>
+                                i
+                            </div>
+
+                            <Tooltip id="bankInfoTooltip" place="top" effect="solid" type="dark" autoPlace offset={10}>
+                                {bankInfo ? (
+                                    <div>
+                                        <p><strong>Tasa:</strong> {bankInfo.rate}% ({bankInfo.rateType})</p>
+                                        <p><strong>Comisiones:</strong></p>
+                                        <ul>
+                                            {bankInfo.commissions.map((commission, index) => (
+                                                <li key={index}>
+                                                    {commission.name}: {commission.amount} ({commission.type})
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ) : (
+                                    <p>Cargando información del banco...</p>
+                                )}
+                            </Tooltip>
                         </div>
                         <div className="form-group">
                             <label htmlFor="dateTcea">Fecha de pago</label>

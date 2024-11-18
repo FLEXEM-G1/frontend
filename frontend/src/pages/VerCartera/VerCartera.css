@@ -136,3 +136,27 @@
 .form-group-portfolio{
     margin-top: 20px;
 }
+
+.info-icon {
+    margin-bottom: 20px;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+    color: #fff;
+    background-color: #f56;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 20px;
+    margin-left: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.info-icon:hover {
+    background-color: #e44;
+    color: #fff;
+}
+
+[data-tooltip-id] {
+    z-index: 1000 !important;
+}
